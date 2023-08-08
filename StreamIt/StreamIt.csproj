@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <Company>Josh2112 Apps</Company>
+    <RootNamespace>Com.Josh2112.StreamIt</RootNamespace>
+    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
+  </PropertyGroup>
+	
+  <PropertyGroup Condition="'$(Platform)'=='AnyCPU'">
+	<!-- Exclude x86 VLC to speed up build -->
+    <VlcWindowsX86Enabled>false</VlcWindowsX86Enabled>
+  </PropertyGroup>
+	
+  <ItemGroup>
+	<VlcWindowsX64IncludeFiles Include="libvlc.dll" />
+    <VlcWindowsX64IncludeFiles Include="libvlccore.dll" />
+	
+	<VlcWindowsX64IncludeFiles Include="plugins\access\libfilesystem_plugin.dll" />
+	<VlcWindowsX64IncludeFiles Include="plugins\access\libhttp_plugin.dll" />
+	<VlcWindowsX64IncludeFiles Include="plugins\access\libhttps_plugin.dll" />
+	
+    <VlcWindowsX64IncludeFiles Include="plugins\audio_filter\libsamplerate_plugin.dll" />
+	  
+	<!-- Include all codecs except the giant unecessary avcodec -->
+	<VlcWindowsX64IncludeFiles Include="plugins\codec\%2A" />
+	<VlcWindowsX64ExcludeFiles Include="plugins\codec\libavcodec_plugin.dll" />
+	  
+	<VlcWindowsX64IncludeFiles Include="plugins\audio_output\%2A" />
+	<VlcWindowsX64IncludeFiles Include="plugins\demux\%2A" />
+	<VlcWindowsX64IncludeFiles Include="plugins\packetizer\%2A" />
+	<VlcWindowsX64IncludeFiles Include="plugins\misc\libgnutls_plugin.dll" />
+  
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Content Include="Assets\icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+    <PackageReference Include="CoreAudio" Version="1.27.0" />
+    <PackageReference Include="gong-wpf-dragdrop" Version="3.2.1" />
+    <PackageReference Include="LibVLCSharp" Version="3.7.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.18" />
+  </ItemGroup>
+
+</Project>

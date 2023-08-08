@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="Com.Josh2112.StreamIt.PrefixedHyperlink"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Com.Josh2112.StreamIt"
+             xmlns:converters="clr-namespace:Com.Josh2112.StreamIt.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    <UserControl.Resources>
+        <converters:StringIsNullOrWhitespaceConverter x:Key="IsNullOrEmpty"/>
+    </UserControl.Resources>
+
+    <TextBlock DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:PrefixedHyperlink}}">
+        <TextBlock.Style>
+            <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignBody2TextBlock}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Text, Converter={StaticResource IsNullOrEmpty}}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </TextBlock.Style>
+        
+        <Run Text="{Binding Prefix}"/><Hyperlink
+            Command="{Binding Command}" CommandParameter="{Binding CommandParameter}" ToolTip="{Binding ToolTip}">
+            <Run Text="{Binding Text, Mode=OneWay}"/>
+        </Hyperlink>
+    </TextBlock>
+</UserControl>
