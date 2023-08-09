@@ -8,6 +8,7 @@
     <Company>Josh2112 Apps</Company>
     <RootNamespace>Com.Josh2112.StreamIt</RootNamespace>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 	
   <PropertyGroup Condition="'$(Platform)'=='AnyCPU'">

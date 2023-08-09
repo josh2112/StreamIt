@@ -287,6 +287,8 @@ namespace Com.Josh2112.StreamIt
         {
             foreach( var entry in Settings.MediaEntries.Where( m => m.Group == oldName ) )
                 entry.Group = newName;
+
+            Settings.Save();
         }
 
         [RelayCommand]

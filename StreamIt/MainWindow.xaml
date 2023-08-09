@@ -194,38 +194,51 @@
 
                 <ListView.GroupStyle>
                     <GroupStyle>
-                        <GroupStyle.HeaderTemplate>
-                            <DataTemplate>
-                                <StackPanel x:Name="root" Orientation="Horizontal" HorizontalAlignment="Stretch" Background="Transparent">
-                                    <TextBlock Style="{StaticResource MaterialDesignHeadline5TextBlock}" FontWeight="Light"
-                                               Padding="15" Text="{Binding Name}" x:Name="groupNameText">
-                                        <i:Interaction.Behaviors>
-                                            <ui:EditTextInPlaceBehavior TextChanging="EditGroupName_TextChanging" TextChanged="EditGroupName_TextChanged"
-                                                                        UpdateSource="False">
-                                                <ui:EditTextInPlaceBehavior.TextBox>
-                                                    <TextBox Style="{StaticResource MaterialDesignTextBox}" Width="200"
-                                                             FontSize="24" FontWeight="Normal"
-                                                             Foreground="White" Margin="15,10"/>
-                                                </ui:EditTextInPlaceBehavior.TextBox>
-                                            </ui:EditTextInPlaceBehavior>
-                                        </i:Interaction.Behaviors>
-                                    </TextBlock>
-                                    <md:PopupBox x:Name="menu" Visibility="Collapsed">
-                                        <StackPanel>
-                                            <MenuItem Header="Rename" Icon="{md:PackIcon Kind=Rename}"
-                                                      Click="renameGroupMenuItem_Click" Tag="{x:Reference groupNameText}"/>
-                                            <MenuItem Header="Delete" Icon="{md:PackIcon Kind=Trash}" CommandParameter="{Binding Name}"
-                                                      Command="{Binding DataContext.DeleteGroupCommand, Source={x:Reference listView}}"/>
-                                        </StackPanel>
-                                    </md:PopupBox>
-                                </StackPanel>
-                                <DataTemplate.Triggers>
-                                    <Trigger SourceName="root" Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="menu" Property="Visibility" Value="Visible"/>
-                                    </Trigger>
-                                </DataTemplate.Triggers>
-                            </DataTemplate>
-                        </GroupStyle.HeaderTemplate>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="GroupItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type GroupItem}">
+                                            <Expander IsExpanded="True" Header="{Binding}" md:ExpanderAssist.HorizontalHeaderPadding="0">
+                                                <Expander.HeaderTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel x:Name="root" Orientation="Horizontal" HorizontalAlignment="Stretch" Background="Transparent">
+                                                            <TextBlock Style="{StaticResource MaterialDesignHeadline5TextBlock}" FontWeight="Light"
+                                                                       Padding="15" Text="{Binding Name}" x:Name="groupNameText">
+                                                                <i:Interaction.Behaviors>
+                                                                    <ui:EditTextInPlaceBehavior TextChanging="EditGroupName_TextChanging" TextChanged="EditGroupName_TextChanged"
+                                                                                                UpdateSource="False">
+                                                                        <ui:EditTextInPlaceBehavior.TextBox>
+                                                                            <TextBox Style="{StaticResource MaterialDesignTextBox}" Width="200"
+                                                                                        FontSize="24" FontWeight="Normal"
+                                                                                        Foreground="White" Margin="15,10"/>
+                                                                        </ui:EditTextInPlaceBehavior.TextBox>
+                                                                    </ui:EditTextInPlaceBehavior>
+                                                                </i:Interaction.Behaviors>
+                                                            </TextBlock>
+                                                            <md:PopupBox x:Name="menu" Visibility="Hidden">
+                                                                <StackPanel>
+                                                                    <MenuItem Header="Rename" Icon="{md:PackIcon Kind=Rename}"
+                                                                              Click="renameGroupMenuItem_Click" Tag="{x:Reference groupNameText}"/>
+                                                                    <MenuItem Header="Delete" Icon="{md:PackIcon Kind=Trash}" CommandParameter="{Binding Name}"
+                                                                              Command="{Binding DataContext.DeleteGroupCommand, Source={x:Reference listView}}"/>
+                                                                </StackPanel>
+                                                            </md:PopupBox>
+                                                        </StackPanel>
+                                                        <DataTemplate.Triggers>
+                                                            <Trigger SourceName="root" Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="menu" Property="Visibility" Value="Visible"/>
+                                                            </Trigger>
+                                                        </DataTemplate.Triggers>
+                                                    </DataTemplate>
+                                                </Expander.HeaderTemplate>
+                                                <ItemsPresenter />
+                                            </Expander>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
                     </GroupStyle>
                 </ListView.GroupStyle>
             </ListView>

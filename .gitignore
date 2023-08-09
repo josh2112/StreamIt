@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+Installers/
+/Installers/StreamIt Installer - 1.0.0.0.exe
