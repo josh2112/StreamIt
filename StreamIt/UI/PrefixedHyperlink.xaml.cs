@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Com.Josh2112.StreamIt
+namespace Com.Josh2112.StreamIt.UI
 {
     /// <summary>
     /// Interaction logic for PrefixedHyperlink.xaml

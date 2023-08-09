@@ -51,14 +51,13 @@ namespace Com.Josh2112.StreamIt
         [JsonIgnore]
         public Song? CurrentSong => History.LastOrDefault();
 
-        [ObservableProperty]
-        [property: JsonIgnore]
-        private string? _imagePath;
+        [JsonIgnore]
+        public string? ImagePath => !string.IsNullOrEmpty( ImageFilename ) ? Path.Combine( Utils.DataPath.Value, ImageFilename ) : null;
 
         [JsonIgnore]
         public LibVLCSharp.Shared.Media? Media { get; set; }
 
-        partial void OnImageFilenameChanged( string value ) => ImagePath = Path.Combine( Utils.DataPath.Value, value );
+        partial void OnImageFilenameChanged( string value ) => OnPropertyChanged( nameof( ImagePath ) );
 
         public MediaEntry() => History.CollectionChanged += ( s, e ) => OnPropertyChanged( nameof( CurrentSong ) );
 
@@ -67,10 +66,7 @@ namespace Com.Josh2112.StreamIt
 
     public class EmptyGroupPlaceholder : MediaEntry
     {
-        public EmptyGroupPlaceholder( string group )
-        {
-            Group = Name = group;
-        }
+        public EmptyGroupPlaceholder( string group ) => Group = Name = group;
     }
 
     public partial class Settings : ObservableObject
