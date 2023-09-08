@@ -12,8 +12,6 @@ namespace Com.Josh2112.StreamIt
             dragInfo.PositionInDraggedItem.Y >= 0;
     }
 
-
-
     public class DropHandler : IDropTarget
     {
         public event EventHandler? ListModified;

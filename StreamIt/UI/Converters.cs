@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Data;
 
 namespace Com.Josh2112.StreamIt.UI.Converters
@@ -23,7 +25,7 @@ namespace Com.Josh2112.StreamIt.UI.Converters
         protected override bool Convert(object value, object parameter) => string.IsNullOrWhiteSpace((string?)value);
     }
 
-    public class MediaStateMatchConverter : TrueFalseConverter
+    public class MediaStateConverter : TrueFalseConverter
     {
         protected override bool Convert(object value, object parameter)
         {
@@ -52,5 +54,11 @@ namespace Com.Josh2112.StreamIt.UI.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
             throw new NotImplementedException();
+    }
+
+    public class NonZeroConverter : TrueFalseConverter
+    {
+        protected override bool Convert( object value, object parameter ) =>
+            System.Convert.ToInt32( value ) != 0;
     }
 }

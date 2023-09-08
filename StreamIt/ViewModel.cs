@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Com.Josh2112.StreamIt.UI;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CoreAudio;
 using MaterialDesignThemes.Wpf;
@@ -14,44 +15,6 @@ using System.Windows.Threading;
 
 namespace Com.Josh2112.StreamIt
 {
-    public partial class AddStationForm : ObservableValidator
-    {
-        [ObservableProperty]
-        [Required]
-        [CustomValidation( typeof( AddStationForm ), nameof( ValidateUrlOrFilePath ) )]
-        private string _urlOrFilePath = "";
-
-        public static ValidationResult ValidateUrlOrFilePath( string value, ValidationContext context )
-        {
-            if( Uri.TryCreate( value, UriKind.Absolute, out Uri? uri ) )
-            {
-                if( uri.IsFile && File.Exists( uri.LocalPath ) && Path.GetExtension( uri.LocalPath ).ToLower() == ".pls" &&
-                    ParseFirstPlaylistEntry( uri ).Item1 != null )
-                    return ValidationResult.Success!;
-
-                if( uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp )
-                    return ValidationResult.Success!;
-            }
-            return new( "Must be a URL or playlist file" );
-        }
-
-        public static (string?, string?) ParseFirstPlaylistEntry( Uri uri )
-        {
-            var lines = File.ReadAllLines( uri.LocalPath );
-            var title = lines.FirstOrDefault( l => l.StartsWith( "Title1" ) )?.Split( "=" )?.ElementAt( 1 ) ?? null;
-            var url = lines.FirstOrDefault( l => l.StartsWith( "File1" ) )?.Split( "=" )?.ElementAt( 1 ) ?? null;
-            return (url, title);
-        }
-
-        public bool Validate()
-        {
-            ValidateAllProperties();
-            return !HasErrors;
-        }
-
-        public void ClearErrors() => base.ClearErrors();
-    }
-
     public partial class ViewModel : ObservableObject
     {
         private readonly Dispatcher dispatcher;
@@ -69,8 +32,6 @@ namespace Com.Josh2112.StreamIt
 
         [ObservableProperty]
         private ListCollectionView? _mediaEntries;
-
-        public AddStationForm AddStationForm { get; } = new();
 
         public DragHandler DragHandler { get; } = new();
 
@@ -96,8 +57,6 @@ namespace Com.Josh2112.StreamIt
         public IEnumerable<string> GroupNames => Settings.MediaEntries.Select( m => m.Group ).Distinct();
 
         public event EventHandler<string?>? NowPlayingChanged;
-
-        public event EventHandler<EmptyGroupPlaceholder>? RenameGroupInvoked;
 
         public async Task InitializeAsync()
         {
@@ -198,7 +157,10 @@ namespace Com.Josh2112.StreamIt
         [RelayCommand]
         public void Play( MediaEntry media )
         {
+            MediaEntries!.MoveCurrentTo( media );
+
             SetMediaState( MediaStates.Stopped );
+            NowPlayingChanged?.Invoke( this, null );
 
             media.Media!.MetaChanged += OnMetadataChanged;
             mediaPlayer!.Play( media.Media );
@@ -230,42 +192,25 @@ namespace Com.Josh2112.StreamIt
             }
         }
 
-        public bool AddStation()
+        public MediaEntry AddStation( AddStationModel station )
         {
-            if( AddStationForm.Validate() )
-            {
-                string? url = AddStationForm.UrlOrFilePath;
-                string? title = null;
+            string? url = station.UrlOrFilePath;
+            string? title = null;
 
-                var uri = new Uri( AddStationForm.UrlOrFilePath );
-                if( uri.IsFile )
-                    (url, title) = AddStationForm.ParseFirstPlaylistEntry( uri );
+            var uri = new Uri( station.UrlOrFilePath );
+            if( uri.IsFile )
+                (url, title) = AddStationModel.ParseFirstPlaylistEntry( uri );
 
-                var entry = new MediaEntry {
-                    Group = Settings.MediaEntries!.FirstOrDefault()?.Group ?? "New group",
-                    Uri = url!,
-                    Name = title ?? string.Empty
-                };
+            var entry = new MediaEntry {
+                Group = Settings.MediaEntries!.FirstOrDefault()?.Group ?? "New group",
+                Uri = url!,
+                Name = title ?? string.Empty
+            };
 
-                Settings.MediaEntries!.Add( entry );
-                MediaEntries!.MoveCurrentTo( entry );
-
-                Settings.Save();
-
-                AddStationForm.UrlOrFilePath = "";
-
-                return true;
-            }
-
-            return false;
-        }
-
-        public void RenameMedia( string oldValue, string newValue )
-        {
-            if( Settings.MediaEntries.FirstOrDefault( me => me.Name == oldValue ) is MediaEntry me )
-                me.Name = newValue;
-
+            Settings.MediaEntries!.Add( entry );
             Settings.Save();
+
+            return entry;
         }
 
         [RelayCommand]
@@ -273,29 +218,6 @@ namespace Com.Josh2112.StreamIt
         {
             Settings.MediaEntries.Remove( entry );
             Settings.Save();
-        }
-
-        [RelayCommand]
-        private void AddGroup( string groupName )
-        {
-            var placeholder = new EmptyGroupPlaceholder( groupName );
-            Settings.MediaEntries.Add( placeholder );
-            RenameGroupInvoked?.Invoke( this, placeholder );
-        }
-
-        internal void RenameGroup( string oldName, string newName )
-        {
-            foreach( var entry in Settings.MediaEntries.Where( m => m.Group == oldName ) )
-                entry.Group = newName;
-
-            Settings.Save();
-        }
-
-        [RelayCommand]
-        public void DeleteGroup( string groupName )
-        {
-            if( Settings.MediaEntries.OfType<EmptyGroupPlaceholder>().FirstOrDefault( p => p.Group == groupName ) is EmptyGroupPlaceholder placeholder )
-                DeleteMedia( placeholder );
         }
 
         private void OnMetadataChanged( object? sender, LibVLCSharp.Shared.MediaMetaChangedEventArgs e ) => dispatcher.Invoke( async () => {
