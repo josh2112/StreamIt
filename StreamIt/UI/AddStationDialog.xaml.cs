@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Com.Josh2112.Libs.MaterialDesign.DialogPlus;
+using CommunityToolkit.Mvvm.ComponentModel;
 using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
 using System;
@@ -6,6 +7,9 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+
+using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace Com.Josh2112.StreamIt.UI
 {
@@ -21,16 +25,18 @@ namespace Com.Josh2112.StreamIt.UI
             set => SetProperty( ref _urlOrFilePath, value, true );
         }
 
-        public static ValidationResult ValidateUrlOrFilePath( string value, ValidationContext _ )
+        public static ValidationResult? ValidateUrlOrFilePath( string value, ValidationContext _ )
         {
+            if( !value.ToLower().EndsWith( ".pls" ) )
+                return new( "Must be a playlist file or playlist URL" );
+
             if( Uri.TryCreate( value, UriKind.Absolute, out Uri? uri ) )
             {
-                if( uri.IsFile && File.Exists( uri.LocalPath ) && Path.GetExtension( uri.LocalPath ).ToLower() == ".pls" &&
-                    ParseFirstPlaylistEntry( uri ).Item1 != null )
-                    return ValidationResult.Success!;
+                if( uri.IsFile && File.Exists( uri.LocalPath ) && ParseFirstPlaylistEntry( uri ).Item1 != null )
+                    return ValidationResult.Success;
 
                 if( uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp )
-                    return ValidationResult.Success!;
+                    return ValidationResult.Success;
             }
             return new( "Must be a URL or playlist file" );
         }
@@ -48,13 +54,13 @@ namespace Com.Josh2112.StreamIt.UI
             ValidateAllProperties();
             return !HasErrors;
         }
-
-        public void ClearErrors() => base.ClearErrors();
     }
 
-    public partial class AddStationDialog : System.Windows.Controls.UserControl, IDialogWithResponse<AddStationModel?>
+    public partial class AddStationDialog : UserControl, IHasDialogResult<AddStationModel?>
     {
         public AddStationModel Model { get; } = new AddStationModel();
+
+        public DialogResult<AddStationModel?> Result { get; } = new();
 
         public AddStationDialog() => InitializeComponent();
 
@@ -69,16 +75,13 @@ namespace Com.Josh2112.StreamIt.UI
                 Model.UrlOrFilePath = dlg.FileName;
         }
 
-        private void AddStationFormTextBox_TextChanged( object sender, System.Windows.Controls.TextChangedEventArgs e ) =>
-            Model.ClearErrors();
-
         public void CancelButton_Click( object sender, RoutedEventArgs e ) =>
-            DialogHost.CloseDialogCommand.Execute( null, this );
+            Result.Set( null );
 
         public void AddButton_Click( object sender, RoutedEventArgs e )
         {
-            if( Model.IsValid())
-                DialogHost.CloseDialogCommand.Execute( Model, this );
+            if( Model.IsValid() )
+                Result.Set( Model );
         }
     }
 }

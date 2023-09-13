@@ -1,25 +1,22 @@
 ﻿<UserControl x:Class="Com.Josh2112.StreamIt.UI.TextInputDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             mc:Ignorable="d" 
-             DataContext="{Binding RelativeSource={RelativeSource Self}}"
-             d:DesignHeight="450" d:DesignWidth="800">
+             DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
-    <Border BorderBrush="{DynamicResource SecondaryHueMidBrush}" CornerRadius="6" BorderThickness="1.5"
-            DataContext="{Binding Model}">
+    <Border BorderBrush="{DynamicResource SecondaryHueMidBrush}" CornerRadius="6" BorderThickness="1.5">
         <StackPanel Margin="20">
-            <TextBlock Style="{StaticResource MaterialDesignHeadline5TextBlock}" Text="Add station"/>
+            <TextBlock Style="{StaticResource MaterialDesignHeadline5TextBlock}" Text="Rename station"/>
 
             <TextBox Style="{StaticResource MaterialDesignTextBox}" md:HintAssist.Hint="URL or playlist file"
                      Margin="0,10" VerticalAlignment="Center" Width="300" Text="{Binding Model.Text}"
-                     md:TextFieldAssist.HasClearButton="True" TextChanged="TextBox_TextChanged"/>
+                     md:TextFieldAssist.HasClearButton="True"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Style="{StaticResource MaterialDesignFlatSecondaryButton}" Content="Cancel" Click="CancelButton_Click"/>
-                <Button Style="{StaticResource MaterialDesignFlatSecondaryButton}" Content="Rename" Click="OKButton_Click"/>
+                <Button Style="{StaticResource MaterialDesignFlatSecondaryButton}" Content="Cancel"
+                        IsCancel="True" Click="CancelButton_Click"/>
+                <Button Style="{StaticResource MaterialDesignFlatSecondaryButton}" Content="Rename"
+                        IsDefault="True" Click="OKButton_Click"/>
             </StackPanel>
         </StackPanel>
     </Border>

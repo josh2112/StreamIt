@@ -1,10 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Com.Josh2112.Libs.MaterialDesign.DialogPlus;
+using CommunityToolkit.Mvvm.ComponentModel;
 using MaterialDesignThemes.Wpf;
-using Microsoft.Win32;
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
 using System.Windows;
 
 namespace Com.Josh2112.StreamIt.UI
@@ -26,13 +23,13 @@ namespace Com.Josh2112.StreamIt.UI
             ValidateAllProperties();
             return !HasErrors;
         }
-
-        public void ClearErrors() => base.ClearErrors();
     }
 
-    public partial class TextInputDialog : System.Windows.Controls.UserControl, IDialogWithResponse<string?>
+    public partial class TextInputDialog : System.Windows.Controls.UserControl, IHasDialogResult<string?>
     {
         public TextModel Model { get; }
+
+        public DialogResult<string?> Result { get; } = new();
 
         public TextInputDialog( string? text )
         {
@@ -40,16 +37,13 @@ namespace Com.Josh2112.StreamIt.UI
             InitializeComponent();
         }
 
-        private void TextBox_TextChanged( object sender, System.Windows.Controls.TextChangedEventArgs e ) =>
-            Model.ClearErrors();
-
         public void CancelButton_Click( object sender, RoutedEventArgs e ) =>
-            DialogHost.CloseDialogCommand.Execute( null, this );
+            Result.Set( null );
 
         public void OKButton_Click( object sender, RoutedEventArgs e )
         {
-            if( Model.IsValid())
-                DialogHost.CloseDialogCommand.Execute( Model.Text, this );
+            if( Model.IsValid() )
+                Result.Set( Model.Text );
         }
     }
 }

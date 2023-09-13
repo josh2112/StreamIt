@@ -1,13 +1,8 @@
-﻿using Com.Josh2112.StreamIt.UI;
+﻿using Com.Josh2112.Libs.MaterialDesign.DialogPlus;
+using Com.Josh2112.StreamIt.UI;
 using CommunityToolkit.Mvvm.Input;
-using MaterialDesignThemes.Wpf;
-using Microsoft.Win32;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Threading;
 
 
 /// TODO:
@@ -41,7 +36,7 @@ namespace Com.Josh2112.StreamIt
 
         private async void ShowAddStationDialogButton_Click( object sender, RoutedEventArgs e )
         {
-            if( await this.ShowDialogAsync( new AddStationDialog() ) is AddStationModel station )
+            if( await this.ShowDialogForResultAsync( new AddStationDialog() ) is AddStationModel station )
             {
                 var entry = Model.AddStation( station );
                 Model.MediaEntries!.MoveCurrentTo( entry );
@@ -52,7 +47,7 @@ namespace Com.Josh2112.StreamIt
         [RelayCommand]
         private async Task RenameMediaAsync( MediaEntry entry )
         {
-            if( await this.ShowDialogAsync( new TextInputDialog( entry.Name ) ) is string name )
+            if( await this.ShowDialogForResultAsync( new TextInputDialog( entry.Name ) ) is string name )
             {
                 entry.Name = name;
                 Model.Settings.Save();

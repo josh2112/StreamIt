@@ -181,17 +181,7 @@
 
                                     <StackPanel VerticalAlignment="Bottom" Margin="10,20">
                                         <TextBlock x:Name="mediaNameText" Style="{StaticResource MaterialDesignBody1TextBlock}" Text="{Binding DisplayName}"
-                                                   TextTrimming="CharacterEllipsis" HorizontalAlignment="Center">
-                                            <i:Interaction.Behaviors>
-                                                <ui:EditTextInPlaceBehavior TextChanging="EditMediaName_TextChanging" TextChanged="EditMediaName_TextChanged"
-                                                                            UpdateSource="False">
-                                                    <ui:EditTextInPlaceBehavior.TextBox>
-                                                        <TextBox Foreground="White" Style="{StaticResource MaterialDesignTextBox}"
-                                                                 FontSize="16" FontWeight="Normal" Width="300" HorizontalAlignment="Center"/>
-                                                    </ui:EditTextInPlaceBehavior.TextBox>
-                                                </ui:EditTextInPlaceBehavior>
-                                            </i:Interaction.Behaviors>
-                                        </TextBlock>
+                                                   TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
 
                                         <ContentControl Content="{Binding}" ContentTemplate="{StaticResource CurrentSongTitleMarqueeTemplate}"/>
                                     </StackPanel>
@@ -202,7 +192,7 @@
                                             <StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="10,0">
                                                     <Button Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{md:PackIcon Kind=Rename}"
-                                                            Command="{Binding DataContext.RenameMediaCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                            Command="{Binding RenameMediaCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                             ToolTip="Rename" CommandParameter="{Binding}" />
                                                     <Button Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{md:PackIcon Kind=Trash}"
                                                             Command="{Binding DataContext.DeleteMediaCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
