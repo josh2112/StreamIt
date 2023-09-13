@@ -8,7 +8,7 @@
     <Company>Josh2112 Apps</Company>
     <RootNamespace>Com.Josh2112.StreamIt</RootNamespace>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
-    <Version>1.1</Version>
+    <Version>1.2.5</Version>
   </PropertyGroup>
 	
   <PropertyGroup Condition="'$(Platform)'=='AnyCPU'">
@@ -47,7 +47,7 @@
     <PackageReference Include="CoreAudio" Version="1.37.0" />
     <PackageReference Include="gong-wpf-dragdrop" Version="3.2.1" />
     <PackageReference Include="LibVLCSharp" Version="3.7.0" />
-    <PackageReference Include="MaterialDesign.DialogPlus" Version="1.0.0" />
+    <PackageReference Include="MaterialDesign.DialogPlus" Version="1.1.0" />
     <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.18" />
