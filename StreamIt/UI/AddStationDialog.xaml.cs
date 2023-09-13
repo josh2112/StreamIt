@@ -27,18 +27,17 @@ namespace Com.Josh2112.StreamIt.UI
 
         public static ValidationResult? ValidateUrlOrFilePath( string value, ValidationContext _ )
         {
-            if( !value.ToLower().EndsWith( ".pls" ) )
-                return new( "Must be a playlist file or playlist URL" );
-
             if( Uri.TryCreate( value, UriKind.Absolute, out Uri? uri ) )
             {
-                if( uri.IsFile && File.Exists( uri.LocalPath ) && ParseFirstPlaylistEntry( uri ).Item1 != null )
+                if( uri.IsFile && File.Exists( uri.LocalPath ) && value.ToLower().EndsWith( ".pls" ) &&
+                    ParseFirstPlaylistEntry( uri ).Item1 != null )
                     return ValidationResult.Success;
 
                 if( uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp )
                     return ValidationResult.Success;
             }
-            return new( "Must be a URL or playlist file" );
+
+            return new( "Must be a playlist file or URL (.pls) or the URL of a stream" );
         }
 
         public static (string?, string?) ParseFirstPlaylistEntry( Uri uri )

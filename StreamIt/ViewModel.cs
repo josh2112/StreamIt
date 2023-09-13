@@ -4,11 +4,10 @@ using CommunityToolkit.Mvvm.Input;
 using CoreAudio;
 using MaterialDesignThemes.Wpf;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Threading;
@@ -33,8 +32,6 @@ namespace Com.Josh2112.StreamIt
         [ObservableProperty]
         private ListCollectionView? _mediaEntries;
 
-        public DragHandler DragHandler { get; } = new();
-
         public DropHandler DropHandler { get; } = new();
 
         private DateTime? lastStartTime;
@@ -54,8 +51,6 @@ namespace Com.Josh2112.StreamIt
         [ObservableProperty]
         private bool _isVlcInitialized;
 
-        public IEnumerable<string> GroupNames => Settings.MediaEntries.Select( m => m.Group ).Distinct();
-
         public event EventHandler<string?>? NowPlayingChanged;
 
         public async Task InitializeAsync()
@@ -66,8 +61,6 @@ namespace Com.Josh2112.StreamIt
             Settings = Settings.Load();
 
             MediaEntries = new( Settings.MediaEntries );
-            MediaEntries.GroupDescriptions.Add( new PropertyGroupDescription( nameof( MediaEntry.Group ) ) );
-            MediaEntries.IsLiveGrouping = true;
 
             DropHandler.Media = Settings.MediaEntries;
             DropHandler.ListModified += ( s, e ) => Settings.Save();
@@ -91,7 +84,7 @@ namespace Com.Josh2112.StreamIt
                 SnackbarMessages.Enqueue( $"Can't play {LoadedMedia!.DisplayName}" );
             } );
 
-            foreach( var entry in Settings.MediaEntries.Except( Settings.MediaEntries.OfType<EmptyGroupPlaceholder>()))
+            foreach( var entry in Settings.MediaEntries )
                 entry.Media = new LibVLCSharp.Shared.Media( vlc!, new Uri( entry.Uri ), ":no-video" );
 
             cutOffTimer.Tick += ( s, e ) => Stop( LoadedMedia! );
@@ -192,32 +185,46 @@ namespace Com.Josh2112.StreamIt
             }
         }
 
-        public MediaEntry AddStation( AddStationModel station )
+        public async Task<MediaEntry?> AddStationAsync( AddStationModel station )
         {
             string? url = station.UrlOrFilePath;
             string? title = null;
 
             var uri = new Uri( station.UrlOrFilePath );
+
+            if( url.ToLower() is string lower && lower.StartsWith( "http" ) && lower.EndsWith( ".pls" ) )
+            {
+                var response = await MetadataGrabber.HttpClient.GetAsync( uri );
+
+                if( response.Content.Headers.ContentType?.MediaType == "audio/x-scpls" )
+                {
+                    var tmpfile = Path.GetTempFileName();
+                    File.WriteAllText( tmpfile, await response.Content.ReadAsStringAsync() );
+                    uri = new Uri( tmpfile );
+                }
+            }
+
             if( uri.IsFile )
+            {
                 (url, title) = AddStationModel.ParseFirstPlaylistEntry( uri );
+            }
 
-            var entry = new MediaEntry {
-                Group = Settings.MediaEntries!.FirstOrDefault()?.Group ?? "New group",
-                Uri = url!,
-                Name = title ?? string.Empty
-            };
+            if( url != null )
+            {
+                var entry = new MediaEntry {
+                    Uri = url!,
+                    Name = title ?? string.Empty
+                };
 
-            Settings.MediaEntries!.Add( entry );
-            Settings.Save();
+                entry.Media = new LibVLCSharp.Shared.Media( vlc!, new Uri( entry.Uri ), ":no-video" );
 
-            return entry;
-        }
+                Settings.MediaEntries!.Add( entry );
+                Settings.Save();
 
-        [RelayCommand]
-        public void DeleteMedia( MediaEntry entry )
-        {
-            Settings.MediaEntries.Remove( entry );
-            Settings.Save();
+                return entry;
+            }
+
+            return null;
         }
 
         private void OnMetadataChanged( object? sender, LibVLCSharp.Shared.MediaMetaChangedEventArgs e ) => dispatcher.Invoke( async () => {
@@ -239,6 +246,11 @@ namespace Com.Josh2112.StreamIt
                             var song = LoadedMedia.CurrentSong!;
                             song.SongData = await MetadataGrabber.GetSongMetadata( song.Name,
                                 MetadataGrabber.Engines.Deezer ) ?? song.SongData;
+                            if( song.SongData.ImagePath != null )
+                            {
+                                LoadedMedia.LastSongImagePath = song.SongData.ImagePath!;
+                                Settings.Save();
+                            }
                         }
                         break;
 
@@ -258,5 +270,14 @@ namespace Com.Josh2112.StreamIt
                 }
             }
         } );
+
+        public void DeleteMedia( MediaEntry entry )
+        {
+            if( LoadedMedia == entry )
+                Stop( entry );
+
+            Settings.MediaEntries.Remove( entry );
+            Settings.Save();
+        }
     }
 }

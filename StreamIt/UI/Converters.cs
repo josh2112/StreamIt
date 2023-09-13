@@ -47,18 +47,18 @@ namespace Com.Josh2112.StreamIt.UI.Converters
             throw new NotImplementedException();
     }
 
-    public class DisplayNameToLetterIconConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
-            value?.ToString()?.ToUpper()[..2] ?? string.Empty;
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
-            throw new NotImplementedException();
-    }
-
     public class NonZeroConverter : TrueFalseConverter
     {
         protected override bool Convert( object value, object parameter ) =>
             System.Convert.ToInt32( value ) != 0;
+    }
+
+    public class DisplayNameToLetterIconConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+            value?.ToString()?.ToUpper() is string name && name.Length > 1 ? name[..2] : string.Empty;
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+            throw new NotImplementedException();
     }
 }

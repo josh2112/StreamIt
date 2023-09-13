@@ -106,7 +106,7 @@ namespace Com.Josh2112.StreamIt
                 Utils.GetFileExtensionForMimeType( mimeType ) is string ext )
             {
                 Debug.WriteLine( $"Downloading artwork of type {mimeType}" );
-                string path = $"{filePathWithoutExtension}.{ext}";
+                string path = $"{filePathWithoutExtension}{ext}";
 
                 await File.WriteAllBytesAsync( path, await response.Content.ReadAsByteArrayAsync() );
                 return path;

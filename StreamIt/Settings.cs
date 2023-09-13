@@ -42,6 +42,9 @@ namespace Com.Josh2112.StreamIt
         private string _imageFilename = "";
 
         [ObservableProperty]
+        private string _lastSongImagePath = "";
+
+        [ObservableProperty]
         [property: JsonIgnore]
         private MediaStates _state;
 
@@ -52,12 +55,14 @@ namespace Com.Josh2112.StreamIt
         public Song? CurrentSong => History.LastOrDefault();
 
         [JsonIgnore]
-        public string? ImagePath => !string.IsNullOrEmpty( ImageFilename ) ? Path.Combine( Utils.DataPath.Value, ImageFilename ) : null;
+        public string? ImagePath => !string.IsNullOrEmpty( ImageFilename ) ? Path.Combine( Utils.DataPath.Value, ImageFilename ) :
+            !string.IsNullOrEmpty( LastSongImagePath ) ? LastSongImagePath : null;
 
         [JsonIgnore]
         public LibVLCSharp.Shared.Media? Media { get; set; }
 
         partial void OnImageFilenameChanged( string value ) => OnPropertyChanged( nameof( ImagePath ) );
+        partial void OnLastSongImagePathChanged( string value ) => OnPropertyChanged( nameof( ImagePath ) );
 
         public MediaEntry() => History.CollectionChanged += ( s, e ) => OnPropertyChanged( nameof( CurrentSong ) );
 
