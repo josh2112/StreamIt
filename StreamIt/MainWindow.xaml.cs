@@ -3,15 +3,10 @@ using Com.Josh2112.Libs.MaterialDesign.DialogPlus.Dialogs;
 using Com.Josh2112.StreamIt.UI;
 using CommunityToolkit.Mvvm.Input;
 using GongSolutions.Wpf.DragDrop;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Documents;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 /// TODO:
 /// Automatically find station icon 
@@ -43,7 +38,6 @@ namespace Com.Josh2112.StreamIt
             if( (sender as FrameworkElement)?.DataContext is MediaEntry entry && entry.State != MediaStates.Playing )
                 Model.Play( entry );
         }
-
 
         private async void ShowAddStationDialogButton_Click( object sender, RoutedEventArgs e )
         {
@@ -136,6 +130,13 @@ namespace Com.Josh2112.StreamIt
                 Model.MediaEntries!.MoveCurrentTo( entry );
                 Model.Play( entry );
             }
+        }
+
+        private async void ShowEditTagsDialogButton_Click( object sender, RoutedEventArgs e )
+        {
+            if( (sender as FrameworkElement)?.DataContext is MediaEntry entry )
+                if( await this.ShowDialogForResultAsync( new EditTagsDialog( entry, Model.Settings.Tags ) ) )
+                    Model.Settings.Save();
         }
     }
 }

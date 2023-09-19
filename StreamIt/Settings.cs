@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Windows.Media;
 
 namespace Com.Josh2112.StreamIt
 {
@@ -26,10 +27,18 @@ namespace Com.Josh2112.StreamIt
         public Song( string name, DateTime? start ) => (Name, Start) = (name, start);
     }
 
-    public partial class MediaEntry : ObservableObject
+    public partial class MediaTag : ObservableObject
     {
         [ObservableProperty]
-        private string _group = "";
+        private string _name = "";
+
+        [ObservableProperty]
+        private Color _color;
+    }
+
+    public partial class MediaEntry : ObservableObject
+    {
+        public ObservableCollection<MediaTag> Tags { get; set; } = new();
 
         [ObservableProperty]
         private string _name = "";
@@ -69,17 +78,17 @@ namespace Com.Josh2112.StreamIt
         partial void OnNameChanged( string value ) => OnPropertyChanged( nameof( DisplayName ) );
     }
 
-    public class EmptyGroupPlaceholder : MediaEntry
-    {
-        public EmptyGroupPlaceholder( string group ) => Group = Name = group;
-    }
 
     public partial class Settings : ObservableObject
     {
         private static readonly string SETTINGS_PATH = Path.Combine( Utils.DataPath.Value, "settings.json" );
 
         private static readonly JsonSerializerOptions JSON_OPTS = new() {
-            WriteIndented = true
+            WriteIndented = true,
+            ReferenceHandler = ReferenceHandler.Preserve,
+            Converters = {
+                new ColorJsonConverter()
+            }
         };
 
         public static readonly Settings DEFAULT = new( new() {
@@ -95,11 +104,7 @@ namespace Com.Josh2112.StreamIt
         {
             try
             {
-                var settings = JsonSerializer.Deserialize<Settings>( File.ReadAllText( SETTINGS_PATH ), JSON_OPTS ) ?? DEFAULT;
-                foreach( var placeholder in settings.MediaEntries.Where( me => string.IsNullOrWhiteSpace( me.Uri ) ).ToList())
-                    settings.MediaEntries[settings.MediaEntries.IndexOf( placeholder )] = new EmptyGroupPlaceholder( placeholder.Group );
-
-                return settings;
+                return JsonSerializer.Deserialize<Settings>( File.ReadAllText( SETTINGS_PATH ), JSON_OPTS ) ?? DEFAULT;
             }
             catch( FileNotFoundException )
             {
@@ -126,7 +131,18 @@ namespace Com.Josh2112.StreamIt
 
         public ObservableCollection<MediaEntry> MediaEntries { get; } = new();
 
+        public ObservableCollection<MediaTag> Tags { get; } = new();
+
         public Settings( ObservableCollection<MediaEntry>? mediaEntries = null ) =>
             MediaEntries = mediaEntries ?? MediaEntries;
+    }
+
+    public class ColorJsonConverter : JsonConverter<Color>
+    {
+        public override Color Read( ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options ) =>
+            (Color)ColorConverter.ConvertFromString( reader.GetString() );
+
+        public override void Write( Utf8JsonWriter writer, Color value, JsonSerializerOptions options ) =>
+            writer.WriteStringValue( value.ToString() );
     }
 }

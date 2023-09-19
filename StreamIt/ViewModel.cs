@@ -7,7 +7,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Threading;
@@ -31,8 +30,6 @@ namespace Com.Josh2112.StreamIt
 
         [ObservableProperty]
         private ListCollectionView? _mediaEntries;
-
-        public DropHandler DropHandler { get; } = new();
 
         private DateTime? lastStartTime;
 
@@ -61,9 +58,6 @@ namespace Com.Josh2112.StreamIt
             Settings = Settings.Load();
 
             MediaEntries = new( Settings.MediaEntries );
-
-            DropHandler.Media = Settings.MediaEntries;
-            DropHandler.ListModified += ( s, e ) => Settings.Save();
 
             MediaEntries.CurrentChanged += ( s, e ) => OnPropertyChanged( nameof( SelectedMedia ) );
 

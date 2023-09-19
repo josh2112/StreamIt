@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Globalization;
-using System.Linq;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace Com.Josh2112.StreamIt.UI.Converters
 {
@@ -60,5 +59,21 @@ namespace Com.Josh2112.StreamIt.UI.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
             throw new NotImplementedException();
+    }
+
+    public class ColorToBrushConverter : IValueConverter
+    {
+        public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
+        {
+            if( value is Color color )
+                return new SolidColorBrush( color );
+            else
+                throw new ArgumentException( "value must be a System.Windows.Media.Color" );
+        }
+
+        public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
+        {
+            throw new NotImplementedException();
+        }
     }
 }
