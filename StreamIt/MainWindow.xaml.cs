@@ -6,12 +6,11 @@ using GongSolutions.Wpf.DragDrop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Documents;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Threading;
 
 /// TODO:
 /// Automatically find station icon 
@@ -137,5 +136,33 @@ namespace Com.Josh2112.StreamIt
                 Model.Play( entry );
             }
         }
+
+        private void Window_PreviewTextInput( object sender, TextCompositionEventArgs e )
+        {
+            if( e.Text == "/" ) Model.IsSearching = true;
+        }
+
+        private void SearchTextBox_PreviewKeyDown( object sender, KeyEventArgs e )
+        {
+            if( e.Key == Key.Enter || e.Key == Key.Escape ) Model.IsSearching = false;
+        }
+
+        private void SearchTextBox_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )
+        {
+            if( sender is TextBox textBox && (bool)e.NewValue )
+                Dispatcher.BeginInvoke( () => {
+                    textBox.Focus();
+                    textBox.SelectAll();
+                }, DispatcherPriority.Render );
+        }
+
+        private void SearchTextBlock_MouseDown( object sender, MouseButtonEventArgs e ) =>
+            Model.IsSearching = true;
+
+        private void SearchTextBox_LostFocus( object sender, RoutedEventArgs e ) =>
+            Model.IsSearching = false;
+
+        private void ClearSearchButton_Click( object sender, RoutedEventArgs e ) =>
+            Model.SearchText = "";
     }
 }

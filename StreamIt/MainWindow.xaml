@@ -15,7 +15,8 @@
         Width="800" Height="510"
         DataContext="{Binding Model, RelativeSource={RelativeSource Self}}"
         dd:DragDrop.IsDropTarget="True"
-        dd:DragDrop.DropHandler="{Binding RelativeSource={RelativeSource Self}}">
+        dd:DragDrop.DropHandler="{Binding RelativeSource={RelativeSource Self}}"
+        PreviewTextInput="Window_PreviewTextInput">
 
     <Window.Resources>
         <ui:BindingProxy x:Key="windowProxy" Data="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
@@ -301,6 +302,22 @@
                 <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" Foreground="{DynamicResource SecondaryHueMidBrush}" IsIndeterminate="True"/>
                 <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}" Margin="10,0,0,0" Text="Initializing VLC..."/>
             </StackPanel>
+
+            <StackPanel Margin="10" Orientation="Horizontal" MouseDown="SearchTextBlock_MouseDown"
+                        Visibility="{Binding SearchText, Converter={StaticResource StringIsEmptyVisibilityConverter}}"
+                        HorizontalAlignment="Left" VerticalAlignment="Top">
+                <TextBlock Text="{Binding SearchText}"/>
+                <Button Style="{StaticResource MaterialDesignToolForegroundButton}" Content="{md:PackIcon Kind=ClearCircleOutline,Size=16}"
+                        Height="NaN" Width="NaN" Margin="0" Padding="5,0,0,0" Click="ClearSearchButton_Click"/>
+            </StackPanel>
+
+            <md:Card Visibility="{Binding IsSearching, Converter={StaticResource BooleanToVisibilityConverter}}"
+                     HorizontalAlignment="Left" VerticalAlignment="Top"
+                     Margin="10,5" Padding="10,5">
+                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" md:TextFieldAssist.HasLeadingIcon="True" md:TextFieldAssist.LeadingIcon="Search"
+                         IsVisibleChanged="SearchTextBox_IsVisibleChanged" PreviewKeyDown="SearchTextBox_PreviewKeyDown"
+                         LostFocus="SearchTextBox_LostFocus"/>
+            </md:Card>
 
             <md:Snackbar MessageQueue="{Binding SnackbarMessages}" HorizontalAlignment="Left"/>
 

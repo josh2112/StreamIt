@@ -7,7 +7,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Threading;
@@ -51,6 +50,14 @@ namespace Com.Josh2112.StreamIt
         [ObservableProperty]
         private bool _isVlcInitialized;
 
+        [ObservableProperty]
+        private bool _isSearching;
+
+        [ObservableProperty]
+        private string _searchText = "";
+
+        private string searchTextLowercase = "";
+
         public event EventHandler<string?>? NowPlayingChanged;
 
         public async Task InitializeAsync()
@@ -66,6 +73,8 @@ namespace Com.Josh2112.StreamIt
             DropHandler.ListModified += ( s, e ) => Settings.Save();
 
             MediaEntries.CurrentChanged += ( s, e ) => OnPropertyChanged( nameof( SelectedMedia ) );
+
+            MediaEntries.Filter = ( obj ) => obj is MediaEntry me && PassesFilter( me );
 
             await Task.Run( () => {
                 vlc = new LibVLCSharp.Shared.LibVLC();
@@ -112,6 +121,19 @@ namespace Com.Josh2112.StreamIt
                 };
             }
         }
+
+        
+
+        partial void OnSearchTextChanged( string value )
+        {
+            searchTextLowercase = SearchText.ToLower();
+            MediaEntries?.Refresh();
+        }
+
+        private bool PassesFilter( MediaEntry me ) =>
+            string.IsNullOrWhiteSpace( searchTextLowercase ) ||
+            me.Name.ToLower().Contains( searchTextLowercase ) ||
+            me.Group.ToLower().Contains( searchTextLowercase );
 
         private void OnMixerVolumeChanged( object sender, float newVolume, bool newMute ) =>
             Settings.Volume = (int)Math.Round( newVolume * 100 );

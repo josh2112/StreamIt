@@ -22,7 +22,7 @@ namespace Com.Josh2112.StreamIt.UI
         private void ListView_PreviewMouseWheel( object sender, MouseWheelEventArgs e )
         {
             var idx = AssociatedObject.SelectedItem is null ? 0 : AssociatedObject.SelectedIndex;
-            AssociatedObject.SelectedIndex = Math.Clamp( idx + (e.Delta < 1 ? -1 : 1), 0, AssociatedObject.Items.Count - 1 );
+            AssociatedObject.SelectedIndex = Math.Clamp( idx + (e.Delta < 1 ? 1 : -1), 0, AssociatedObject.Items.Count - 1 );
         }
     }
 }
