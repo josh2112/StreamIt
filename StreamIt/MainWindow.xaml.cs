@@ -3,7 +3,6 @@ using Com.Josh2112.Libs.MaterialDesign.DialogPlus.Dialogs;
 using Com.Josh2112.StreamIt.UI;
 using CommunityToolkit.Mvvm.Input;
 using GongSolutions.Wpf.DragDrop;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,7 +41,6 @@ namespace Com.Josh2112.StreamIt
             if( (sender as FrameworkElement)?.DataContext is MediaEntry entry && entry.State != MediaStates.Playing )
                 Model.Play( entry );
         }
-
 
         private async void ShowAddStationDialogButton_Click( object sender, RoutedEventArgs e )
         {
@@ -145,6 +143,13 @@ namespace Com.Josh2112.StreamIt
         private void SearchTextBox_PreviewKeyDown( object sender, KeyEventArgs e )
         {
             if( e.Key == Key.Enter || e.Key == Key.Escape ) Model.IsSearching = false;
+        }
+
+        private async void ShowEditTagsDialogButton_Click( object sender, RoutedEventArgs e )
+        {
+            if( (sender as FrameworkElement)?.DataContext is MediaEntry entry )
+                if( await this.ShowDialogForResultAsync( new EditTagsDialog( entry, Model.Settings.Tags ) ) )
+                    Model.Settings.Save();
         }
 
         private void SearchTextBox_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )

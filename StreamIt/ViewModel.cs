@@ -31,8 +31,6 @@ namespace Com.Josh2112.StreamIt
         [ObservableProperty]
         private ListCollectionView? _mediaEntries;
 
-        public DropHandler DropHandler { get; } = new();
-
         private DateTime? lastStartTime;
 
         public TimeSpan? ElapsedTime => lastStartTime is not null ? TimeSpan.FromSeconds(
@@ -68,9 +66,6 @@ namespace Com.Josh2112.StreamIt
             Settings = Settings.Load();
 
             MediaEntries = new( Settings.MediaEntries );
-
-            DropHandler.Media = Settings.MediaEntries;
-            DropHandler.ListModified += ( s, e ) => Settings.Save();
 
             MediaEntries.CurrentChanged += ( s, e ) => OnPropertyChanged( nameof( SelectedMedia ) );
 

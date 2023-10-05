@@ -12,7 +12,7 @@
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
         FontFamily="{md:MaterialDesignFont}"
-        Width="800" Height="510"
+        Width="800" Height="500"
         DataContext="{Binding Model, RelativeSource={RelativeSource Self}}"
         dd:DragDrop.IsDropTarget="True"
         dd:DragDrop.DropHandler="{Binding RelativeSource={RelativeSource Self}}"
@@ -63,6 +63,13 @@
                     </TextBlock.Style>
                 </TextBlock>
             </ScrollViewer>
+        </DataTemplate>
+
+        <DataTemplate x:Key="TagTemplate">
+            <Grid>
+                <Ellipse Width="25" Height="25" Fill="{Binding Color}"/>
+                <TextBlock Text="{Binding Name, Converter={StaticResource DisplayNameToLetterIconConverter}}" TextAlignment="Center"/>
+            </Grid>
         </DataTemplate>
     </Window.Resources>
 
@@ -147,34 +154,34 @@
                               Margin="0,10,0,0" md:ListBoxItemAssist.ShowSelection="False"
                               IsEnabled="{Binding IsVlcInitialized}" Style="{StaticResource MaterialDesignListView}"
                               md:ListBoxItemAssist.CornerRadius="20" HorizontalAlignment="Center">
-                    <i:Interaction.Behaviors>
-                        <ui:SelectorMouseWheelSelectBehavior/>
-                        <ui:SelectorAnimateToSelectedItemBehavior/>
-                    </i:Interaction.Behaviors>
+                        <i:Interaction.Behaviors>
+                            <ui:SelectorMouseWheelSelectBehavior/>
+                            <ui:SelectorAnimateToSelectedItemBehavior/>
+                        </i:Interaction.Behaviors>
 
-                    <ListView.Resources>
-                        <DataTemplate DataType="{x:Type local:MediaEntry}">
-                            <Border CornerRadius="40" Padding="10" Width="350">
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Setter Property="Background" Value="Transparent"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding State}" Value="Playing">
-                                                <Setter Property="Background" Value="#1fff"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
+                        <ListView.Resources>
+                            <DataTemplate DataType="{x:Type local:MediaEntry}">
+                                <Border CornerRadius="40" Padding="10" Width="350">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding State}" Value="Playing">
+                                                    <Setter Property="Background" Value="#1fff"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
 
-                                    <Grid>
-                                        <Grid x:Name="card"  Margin="40,10" VerticalAlignment="Top">
+                                    <StackPanel>
+                                        <Grid x:Name="card" Margin="40,10">
                                             <md:Card Height="250" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
                                                      md:UniformCornerRadius="40" md:ElevationAssist.Elevation="Dp0" Background="#1fff">
                                                 <Grid>
                                                     <Border Margin="40" CornerRadius="40" BorderBrush="{DynamicResource gradientBrush}" BorderThickness="4">
                                                         <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}" HorizontalAlignment="Center" 
-                                                                    VerticalAlignment="Center" Foreground="{DynamicResource gradientBrush}"
-                                                                    Text="{Binding DisplayName, Converter={StaticResource DisplayNameToLetterIconConverter}}" />
+                                                                   VerticalAlignment="Center" Foreground="{DynamicResource gradientBrush}"
+                                                                   Text="{Binding DisplayName, Converter={StaticResource DisplayNameToLetterIconConverter}}" />
                                                     </Border>
                                                     <Border>
                                                         <Border.Background>
@@ -189,27 +196,24 @@
                                                 </Grid>
                                             </md:Card>
                                             <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" Foreground="{DynamicResource SecondaryHueMidBrush}"
-                                                        IsIndeterminate="True" Width="50" Height="50"
-                                                        Visibility="{Binding State, Converter={StaticResource VisibleIfState}, ConverterParameter=Opening}"/>
+                                                         IsIndeterminate="True" Width="50" Height="50"
+                                                         Visibility="{Binding State, Converter={StaticResource VisibleIfState}, ConverterParameter=Opening}"/>
 
-
-
-                                            <Grid x:Name="controlsPanel" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                                  Margin="0,0,15,15">
+                                            <Grid x:Name="controlsPanel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,15,15">
                                                 <Ellipse Width="40" Height="40" Fill="#3000"></Ellipse>
                                                 <md:PopupBox HorizontalAlignment="Center" ToolTip="View song history, rename or delete this station">
                                                     <StackPanel>
                                                         <StackPanel Orientation="Horizontal" Margin="10,0">
                                                             <Button Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{md:PackIcon Kind=Rename}"
-                                                            Command="{Binding Data.RenameMediaCommand, Source={StaticResource windowProxy}}"
-                                                            CommandParameter="{Binding}" ToolTip="Rename"/>
+                                                                    Command="{Binding Data.RenameMediaCommand, Source={StaticResource windowProxy}}"
+                                                                    CommandParameter="{Binding}" ToolTip="Rename"/>
                                                             <Button Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{md:PackIcon Kind=Trash}"
-                                                            Command="{Binding Data.DeleteMediaCommand, Source={StaticResource windowProxy}}"
-                                                            CommandParameter="{Binding}" ToolTip="Delete"/>
+                                                                    Command="{Binding Data.DeleteMediaCommand, Source={StaticResource windowProxy}}"
+                                                                    CommandParameter="{Binding}" ToolTip="Delete"/>
                                                         </StackPanel>
                                                         <TextBlock Margin="10" Text="No song history" Visibility="{Binding History.Count, Converter={StaticResource VisibleIfZero}}"/>
                                                         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
-                                                              Visibility="{Binding History.Count, Converter={StaticResource VisibleIfNonZero}}">
+                                                                      Visibility="{Binding History.Count, Converter={StaticResource VisibleIfNonZero}}">
                                                             <ItemsControl ItemsSource="{Binding History}" Padding="5">
                                                                 <ItemsControl.ItemsPanel>
                                                                     <ItemsPanelTemplate>
@@ -227,7 +231,7 @@
                                                                             <Grid DockPanel.Dock="Left" Width="64" Height="64" Margin="0,0,15,0" VerticalAlignment="Top">
                                                                                 <Border CornerRadius="15" BorderBrush="{DynamicResource gradientBrush}" BorderThickness="3">
                                                                                     <md:PackIcon Kind="Music" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                                                         Foreground="{DynamicResource gradientBrush}"/>
+                                                                                                 Foreground="{DynamicResource gradientBrush}"/>
                                                                                 </Border>
                                                                                 <Border CornerRadius="15">
                                                                                     <Border.Background>
@@ -238,14 +242,14 @@
 
                                                                             <StackPanel VerticalAlignment="Center">
                                                                                 <ui:PrefixedHyperlink Command="{Binding Model.SearchSongCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                                              CommandParameter="{Binding SongData.Title}" Text="{Binding SongData.Title}" ToolTip="Search song"/>
+                                                                                                      CommandParameter="{Binding SongData.Title}" Text="{Binding SongData.Title}" ToolTip="Search song"/>
                                                                                 <StackPanel Orientation="Horizontal">
                                                                                     <ui:PrefixedHyperlink Command="{Binding Model.SearchSongCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                                                  CommandParameter="{Binding SongData.Artist}" Text="{Binding SongData.Artist}"
-                                                                                                  ToolTip="Search artist"/>
+                                                                                                          CommandParameter="{Binding SongData.Artist}" Text="{Binding SongData.Artist}"
+                                                                                                          ToolTip="Search artist"/>
                                                                                     <ui:PrefixedHyperlink Command="{Binding Model.SearchSongCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                                                  CommandParameter="{Binding SongData.Album}" Text="{Binding SongData.Album}"
-                                                                                                  ToolTip="Search album" Prefix=" • "/>
+                                                                                                          CommandParameter="{Binding SongData.Album}" Text="{Binding SongData.Album}"
+                                                                                                          ToolTip="Search album" Prefix=" • "/>
                                                                                     <ui:PrefixedHyperlink Text="{Binding SongData.Year}" Prefix=" • "/>
                                                                                 </StackPanel>
                                                                                 <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}" Opacity="0.5" Margin="0,2,0,0" Text="{Binding Start, StringFormat=t, Mode=OneWay}"/>
@@ -259,40 +263,45 @@
                                                 </md:PopupBox>
                                             </Grid>
                                         </Grid>
-
-
-                                        <StackPanel VerticalAlignment="Bottom" Margin="10,20">
+                                        <Button Style="{StaticResource MaterialDesignFlatButton}" Click="ShowEditTagsDialogButton_Click">
+                                            <ItemsControl ItemsSource="{Binding Tags}" ItemTemplate="{StaticResource TagTemplate}" HorizontalAlignment="Center">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel Orientation="Horizontal"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                            </ItemsControl>
+                                        </Button>
                                         <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="{Binding DisplayName}"
-                                                   TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
+                                                    TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
 
                                         <ContentControl Content="{Binding}" ContentTemplate="{StaticResource CurrentSongTitleMarqueeTemplate}"/>
                                     </StackPanel>
-                                </Grid>
-                            </Border>
+                                </Border>
 
-                            <DataTemplate.Triggers>
-                                <Trigger SourceName="card" Property="IsMouseOver" Value="False">
-                                    <Setter TargetName="controlsPanel" Property="Visibility" Value="Collapsed"/>
-                                </Trigger>
-                            </DataTemplate.Triggers>
-                        </DataTemplate>
-                    </ListView.Resources>
+                                <DataTemplate.Triggers>
+                                    <Trigger SourceName="card" Property="IsMouseOver" Value="False">
+                                        <Setter TargetName="controlsPanel" Property="Visibility" Value="Collapsed"/>
+                                    </Trigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListView.Resources>
 
-                    <ListView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal"/>
-                        </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
 
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
-                            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
-                            <Setter Property="Padding" Value="0"/>
-                            <Setter Property="md:ListBoxItemAssist.CornerRadius" Value="20"/>
-                            <EventSetter Event="MouseDoubleClick" Handler="MediaEntry_MouseDoubleClick"/>
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                </ListView>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                                <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="md:ListBoxItemAssist.CornerRadius" Value="20"/>
+                                <EventSetter Event="MouseDoubleClick" Handler="MediaEntry_MouseDoubleClick"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
                 </Grid>
 
             </DockPanel>
