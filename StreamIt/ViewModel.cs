@@ -119,13 +119,14 @@ namespace Com.Josh2112.StreamIt
 
         partial void OnSearchTextChanged( string value )
         {
-            searchTextLowercase = SearchText.ToLower();
+            searchTextLowercase = SearchText?.ToLower();
             MediaEntries?.Refresh();
         }
 
-        private bool PassesFilter( MediaEntry me ) =>
+        private bool PassesFilter( MediaEntry entry ) =>
             string.IsNullOrWhiteSpace( searchTextLowercase ) ||
-            me.Name.ToLower().Contains( searchTextLowercase );
+            entry.Name.ToLower().Contains( searchTextLowercase ) ||
+            entry.Tags.Any( t => t.Contains( searchTextLowercase ) );
 
         private void OnMixerVolumeChanged( object sender, float newVolume, bool newMute ) =>
             Settings.Volume = (int)Math.Round( newVolume * 100 );

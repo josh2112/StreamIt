@@ -54,6 +54,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="UI\EditTagsDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="UI\TextInputDialog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

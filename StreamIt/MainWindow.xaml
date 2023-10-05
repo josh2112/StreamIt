@@ -64,13 +64,6 @@
                 </TextBlock>
             </ScrollViewer>
         </DataTemplate>
-
-        <DataTemplate x:Key="TagTemplate">
-            <Grid>
-                <Ellipse Width="25" Height="25" Fill="{Binding Color}"/>
-                <TextBlock Text="{Binding Name, Converter={StaticResource DisplayNameToLetterIconConverter}}" TextAlignment="Center"/>
-            </Grid>
-        </DataTemplate>
     </Window.Resources>
 
     <md:DialogHost x:Name="dialogHost">
@@ -143,10 +136,24 @@
                 </Border>
 
                 <Grid>
-                    <TextBlock Style="{StaticResource MaterialDesignHeadline5TextBlock}" Opacity="0.5"
-                               VerticalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="50,0"
+                    <TextBlock Opacity="0.5" VerticalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="50,0"
                                Visibility="{Binding MediaEntries.Count, Converter={StaticResource VisibleIfZero}}">
-                        To get started, drag-and-drop a playlist (.pls) file or URL, or use the '+' button below to choose one.
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignHeadline5TextBlock}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MediaEntries.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding SearchText, Converter={StaticResource IsEmptyString}}" Value="True">
+                                        <Setter Property="Text" Value="To get started, drag-and-drop a playlist (.pls) file or URL, or use the '+' button below to choose one."/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding SearchText, Converter={StaticResource IsEmptyString}}" Value="False">
+                                        <Setter Property="Text" Value="No stations match the filter."/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
                     </TextBlock>
 
                     <ListView x:Name="listView" ItemsSource="{Binding MediaEntries}" SelectionMode="Single"
@@ -207,6 +214,9 @@
                                                             <Button Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{md:PackIcon Kind=Rename}"
                                                                     Command="{Binding Data.RenameMediaCommand, Source={StaticResource windowProxy}}"
                                                                     CommandParameter="{Binding}" ToolTip="Rename"/>
+                                                            <Button Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{md:PackIcon Kind=Tags}"
+                                                                    Command="{Binding Data.EditTagsCommand, Source={StaticResource windowProxy}}"
+                                                                    CommandParameter="{Binding}" ToolTip="Tags"/>
                                                             <Button Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{md:PackIcon Kind=Trash}"
                                                                     Command="{Binding Data.DeleteMediaCommand, Source={StaticResource windowProxy}}"
                                                                     CommandParameter="{Binding}" ToolTip="Delete"/>
@@ -263,15 +273,6 @@
                                                 </md:PopupBox>
                                             </Grid>
                                         </Grid>
-                                        <Button Style="{StaticResource MaterialDesignFlatButton}" Click="ShowEditTagsDialogButton_Click">
-                                            <ItemsControl ItemsSource="{Binding Tags}" ItemTemplate="{StaticResource TagTemplate}" HorizontalAlignment="Center">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <WrapPanel Orientation="Horizontal"/>
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                            </ItemsControl>
-                                        </Button>
                                         <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="{Binding DisplayName}"
                                                     TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
 
@@ -316,14 +317,16 @@
                         Visibility="{Binding SearchText, Converter={StaticResource StringIsEmptyVisibilityConverter}}"
                         HorizontalAlignment="Left" VerticalAlignment="Top">
                 <TextBlock Text="{Binding SearchText}"/>
-                <Button Style="{StaticResource MaterialDesignToolForegroundButton}" Content="{md:PackIcon Kind=ClearCircleOutline,Size=16}"
+                <Button Style="{StaticResource MaterialDesignToolForegroundButton}" Content="{md:PackIcon Kind=ClearCircle,Size=16}"
+                        Opacity="0.2"
                         Height="NaN" Width="NaN" Margin="0" Padding="5,0,0,0" Click="ClearSearchButton_Click"/>
             </StackPanel>
 
             <md:Card Visibility="{Binding IsSearching, Converter={StaticResource BooleanToVisibilityConverter}}"
                      HorizontalAlignment="Left" VerticalAlignment="Top"
                      Margin="10,5" Padding="10,5">
-                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" md:TextFieldAssist.HasLeadingIcon="True" md:TextFieldAssist.LeadingIcon="Search"
+                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" md:TextFieldAssist.HasLeadingIcon="True"
+                         md:TextFieldAssist.LeadingIcon="Search" md:TextFieldAssist.HasClearButton="True"
                          IsVisibleChanged="SearchTextBox_IsVisibleChanged" PreviewKeyDown="SearchTextBox_PreviewKeyDown"
                          LostFocus="SearchTextBox_LostFocus"/>
             </md:Card>

@@ -36,7 +36,7 @@ namespace Com.Josh2112.StreamIt
         private void ChangeTitle( string? title ) =>
             Title = $"{title ?? ""}{(title is not null ? " - " : "")}{Utils.AssemblyInfo.ProductName}";
 
-        private void MediaEntry_MouseDoubleClick( object sender, System.Windows.Input.MouseButtonEventArgs e )
+        private void MediaEntry_MouseDoubleClick( object sender, MouseButtonEventArgs e )
         {
             if( (sender as FrameworkElement)?.DataContext is MediaEntry entry && entry.State != MediaStates.Playing )
                 Model.Play( entry );
@@ -64,6 +64,7 @@ namespace Com.Josh2112.StreamIt
         {
             if( await this.ShowDialogForResultAsync( new TextInputDialog( entry.Name ) ) is string name )
             {
+                entry.Name = name;
                 Model.Settings.Save();
             }
         }
@@ -80,7 +81,18 @@ namespace Com.Josh2112.StreamIt
             }
         }
 
-        private void CurrentSongInfo_MouseDown( object sender, System.Windows.Input.MouseButtonEventArgs e ) =>
+        [RelayCommand]
+        private async Task EditTagsAsync( MediaEntry entry )
+        {
+            if( await this.ShowDialogForResultAsync( new EditTagsDialog( entry.Tags, entry.Tags ) ) is List<string> tags )
+            {
+                entry.Tags.Clear();
+                foreach( var tag in tags ) entry.Tags.Add( tag );
+                Model.Settings.Save();
+            }
+        }
+
+        private void CurrentSongInfo_MouseDown( object sender, MouseButtonEventArgs e ) =>
             Model.MediaEntries!.MoveCurrentTo( Model.LoadedMedia );
 
         private static IEnumerable<string> GetValidDroppedPaths( object dropData )
@@ -142,14 +154,11 @@ namespace Com.Josh2112.StreamIt
 
         private void SearchTextBox_PreviewKeyDown( object sender, KeyEventArgs e )
         {
-            if( e.Key == Key.Enter || e.Key == Key.Escape ) Model.IsSearching = false;
-        }
-
-        private async void ShowEditTagsDialogButton_Click( object sender, RoutedEventArgs e )
-        {
-            if( (sender as FrameworkElement)?.DataContext is MediaEntry entry )
-                if( await this.ShowDialogForResultAsync( new EditTagsDialog( entry, Model.Settings.Tags ) ) )
-                    Model.Settings.Save();
+            if( e.Key == Key.Enter || e.Key == Key.Escape )
+            {
+                if( e.Key == Key.Escape ) Model.SearchText = string.Empty;
+                Model.IsSearching = false;
+            }
         }
 
         private void SearchTextBox_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )

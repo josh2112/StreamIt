@@ -27,18 +27,9 @@ namespace Com.Josh2112.StreamIt
         public Song( string name, DateTime? start ) => (Name, Start) = (name, start);
     }
 
-    public partial class MediaTag : ObservableObject
-    {
-        [ObservableProperty]
-        private string _name = "";
-
-        [ObservableProperty]
-        private Color _color;
-    }
-
     public partial class MediaEntry : ObservableObject
     {
-        public ObservableCollection<MediaTag> Tags { get; set; } = new();
+        public ObservableCollection<string> Tags { get; set; } = new();
 
         [ObservableProperty]
         private string _name = "";
@@ -85,7 +76,6 @@ namespace Com.Josh2112.StreamIt
 
         private static readonly JsonSerializerOptions JSON_OPTS = new() {
             WriteIndented = true,
-            ReferenceHandler = ReferenceHandler.Preserve,
             Converters = {
                 new ColorJsonConverter()
             }
@@ -130,8 +120,6 @@ namespace Com.Josh2112.StreamIt
         private TimeSpan _cutOffTime;
 
         public ObservableCollection<MediaEntry> MediaEntries { get; } = new();
-
-        public ObservableCollection<MediaTag> Tags { get; } = new();
 
         public Settings( ObservableCollection<MediaEntry>? mediaEntries = null ) =>
             MediaEntries = mediaEntries ?? MediaEntries;
