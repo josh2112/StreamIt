@@ -117,8 +117,6 @@ namespace Com.Josh2112.StreamIt
             }
         }
 
-        
-
         partial void OnSearchTextChanged( string value )
         {
             searchTextLowercase = SearchText.ToLower();
@@ -127,8 +125,7 @@ namespace Com.Josh2112.StreamIt
 
         private bool PassesFilter( MediaEntry me ) =>
             string.IsNullOrWhiteSpace( searchTextLowercase ) ||
-            me.Name.ToLower().Contains( searchTextLowercase ) ||
-            me.Group.ToLower().Contains( searchTextLowercase );
+            me.Name.ToLower().Contains( searchTextLowercase );
 
         private void OnMixerVolumeChanged( object sender, float newVolume, bool newMute ) =>
             Settings.Volume = (int)Math.Round( newVolume * 100 );
