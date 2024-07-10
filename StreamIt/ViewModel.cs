@@ -189,7 +189,7 @@ namespace Com.Josh2112.StreamIt
         }
 
         [RelayCommand]
-        public static void SearchSong( string? text )
+        public void SearchSong( string? text )
         {
             if( text is not null )
             {

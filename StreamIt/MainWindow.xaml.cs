@@ -110,12 +110,12 @@ namespace Com.Josh2112.StreamIt
                 string[]? paths = data.GetData( DataFormats.FileDrop ) as string[];
                 
                 if( paths is null && data.GetData( DataFormats.Text ) is string str )
-                    paths = new string[] { str };
+                    paths = [str];
                 
                 if( paths is not null )
                     return paths;
             }
-            return Enumerable.Empty<string>();
+            return [];
         }
 
         void IDropTarget.DragOver( IDropInfo dropInfo )
@@ -140,7 +140,7 @@ namespace Com.Josh2112.StreamIt
                     errors.Add( path );
             }
 
-            if( errors.Any() )
+            if( errors.Count != 0 )
             {
                 await this.ShowDialogForResultAsync( new Dialog( "Couldn't add station",
                     "Ran into a problem adding the following station(s):\n\n" +

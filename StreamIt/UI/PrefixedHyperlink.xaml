@@ -23,8 +23,7 @@
             </Style>
         </TextBlock.Style>
         
-        <Run Text="{Binding Prefix}"/><Hyperlink
-            Command="{Binding Command}" CommandParameter="{Binding CommandParameter}" ToolTip="{Binding ToolTip}">
+        <Run Text="{Binding Prefix}"/><Hyperlink PreviewMouseDown="Hyperlink_Navigate" ToolTip="{Binding ToolTip}">
             <Run Text="{Binding Text, Mode=OneWay}"/>
         </Hyperlink>
     </TextBlock>
