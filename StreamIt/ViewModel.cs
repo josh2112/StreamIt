@@ -119,7 +119,7 @@ namespace Com.Josh2112.StreamIt
 
         partial void OnSearchTextChanged( string value )
         {
-            searchTextLowercase = SearchText?.ToLower();
+            searchTextLowercase = SearchText?.ToLower() ?? "";
             MediaEntries?.Refresh();
         }
 

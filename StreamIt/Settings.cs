@@ -81,11 +81,7 @@ namespace Com.Josh2112.StreamIt
             }
         };
 
-        public static readonly Settings DEFAULT = new( new() {
-            new MediaEntry() {
-                Name = "Progulus",
-                Uri = "http://149.56.234.136:9992/stream",
-            } } ) {
+        public static readonly Settings DEFAULT = new() {
             Volume = 50,
             CutOffTime = new TimeSpan( 18, 0, 0 )
         };

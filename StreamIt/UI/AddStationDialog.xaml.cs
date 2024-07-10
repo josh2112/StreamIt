@@ -1,6 +1,5 @@
 ﻿using Com.Josh2112.Libs.MaterialDesign.DialogPlus;
 using CommunityToolkit.Mvvm.ComponentModel;
-using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
 using System;
 using System.ComponentModel.DataAnnotations;

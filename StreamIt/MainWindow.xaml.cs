@@ -38,7 +38,7 @@ namespace Com.Josh2112.StreamIt
 
         private void MediaEntry_MouseDoubleClick( object sender, MouseButtonEventArgs e )
         {
-            if( (sender as FrameworkElement)?.DataContext is MediaEntry entry && entry.State != MediaStates.Playing )
+            if( sender is FrameworkElement { DataContext: MediaEntry entry } && entry.State != MediaStates.Playing )
                 Model.Play( entry );
         }
 
@@ -62,7 +62,12 @@ namespace Com.Josh2112.StreamIt
         [RelayCommand]
         private async Task RenameMediaAsync( MediaEntry entry )
         {
-            if( await this.ShowDialogForResultAsync( new TextInputDialog( entry.Name ) ) is string name )
+            if( await this.ShowDialogForResultAsync( new TextInputDialog( new TextModel
+            {
+                Title = "Rename station",
+                OKButtonName = "Rename",
+                Text = entry.Name ?? ""
+            } ) ) is string name )
             {
                 entry.Name = name;
                 Model.Settings.Save();
@@ -91,6 +96,9 @@ namespace Com.Josh2112.StreamIt
                 Model.Settings.Save();
             }
         }
+
+        [RelayCommand]
+        private Task ShowAboutDialogAsync() => this.ShowDialogForResultAsync( new AboutDialog() );
 
         private void CurrentSongInfo_MouseDown( object sender, MouseButtonEventArgs e ) =>
             Model.MediaEntries!.MoveCurrentTo( Model.LoadedMedia );

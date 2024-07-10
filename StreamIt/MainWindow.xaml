@@ -7,30 +7,34 @@
         xmlns:ui="clr-namespace:Com.Josh2112.StreamIt.UI"
         xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:converters="clr-namespace:Com.Josh2112.StreamIt.UI.Converters"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        Background="{DynamicResource MaterialDesignPaper}"
-        TextElement.FontWeight="Medium"
-        TextElement.FontSize="14"
-        FontFamily="{md:MaterialDesignFont}"
+        Style="{StaticResource MaterialDesignWindow}"
         Width="800" Height="500"
         DataContext="{Binding Model, RelativeSource={RelativeSource Self}}"
         dd:DragDrop.IsDropTarget="True"
         dd:DragDrop.DropHandler="{Binding RelativeSource={RelativeSource Self}}"
         PreviewTextInput="Window_PreviewTextInput">
 
+    <i:Interaction.Behaviors>
+        <ui:ThemeAwareWindowChromeBehavior/>
+    </i:Interaction.Behaviors>
+
     <Window.Resources>
         <ui:BindingProxy x:Key="windowProxy" Data="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
         
         <converters:StringIsNullOrWhitespaceConverter x:Key="IsEmptyString"/>
-        <converters:MediaStateConverter x:Key="VisibleIfState" TrueValue="Visible" FalseValue="Collapsed"/>
-        <converters:NullConverter x:Key="VisibleIfNull" NullValue="Visible" NotNullValue="Collapsed"/>
         <converters:DisplayNameToLetterIconConverter x:Key="DisplayNameToLetterIconConverter"/>
+        <converters:MediaStateConverter x:Key="VisibleIfState" TrueValue="Visible" FalseValue="Collapsed"/>
+        
+        <converters:NullConverter x:Key="VisibleIfNull" NullValue="Visible" NotNullValue="Collapsed"/>
         <converters:NullConverter x:Key="IsNotNullConverter" NullValue="False" NotNullValue="True"/>
         <converters:NonZeroConverter x:Key="VisibleIfNonZero" TrueValue="Visible" FalseValue="Collapsed"/>
         <converters:NonZeroConverter x:Key="VisibleIfZero" TrueValue="Collapsed" FalseValue="Visible"/>
+        
+        <converters:BooleanToVisibilityConverter x:Key="VisibleIfTrue"/>
+        <converters:InverseBooleanToVisibilityConverter x:Key="VisibleIfFalse"/>
 
-        <FrameworkElement x:Key="PrimaryHueProxy" DataContext="{DynamicResource PrimaryHueMidBrush}"/>
-        <FrameworkElement x:Key="SecondaryHueProxy" DataContext="{DynamicResource SecondaryHueMidBrush}"/>
+        <FrameworkElement x:Key="PrimaryHueProxy" DataContext="{DynamicResource MaterialDesign.Brush.Primary}"/>
+        <FrameworkElement x:Key="SecondaryHueProxy" DataContext="{DynamicResource MaterialDesign.Brush.Secondary}"/>
 
         <LinearGradientBrush x:Key="gradientBrush" StartPoint="0.3,0" EndPoint="0.7,1">
             <LinearGradientBrush.GradientStops>
@@ -64,9 +68,10 @@
                 </TextBlock>
             </ScrollViewer>
         </DataTemplate>
+        
     </Window.Resources>
 
-    <md:DialogHost x:Name="dialogHost">
+    <md:DialogHost Style="{StaticResource NeonDialogHost}">
         <Grid>
             <Border Opacity="0.2" Background="{StaticResource gradientBrush}"/>
             <Border Opacity="0.2">
@@ -90,7 +95,7 @@
 
                 <!-- Controls area -->
                 <Border DockPanel.Dock="Bottom" Margin="10" Padding="20,10" CornerRadius="30"
-                        Visibility="{Binding IsVlcInitialized, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                        Visibility="{Binding IsVlcInitialized, Converter={StaticResource VisibleIfTrue}}" 
                         Background="#1fff" HorizontalAlignment="Center">
 
                     <DockPanel LastChildFill="False">
@@ -102,14 +107,14 @@
                                           Content="{md:PackIcon Kind=VolumeHigh,Size=24}" ToolTip="Mute/unmute"
                                           md:ToggleButtonAssist.OnContent="{md:PackIcon Kind=VolumeMute,Size=24}"/>
                             <Slider Width="100" VerticalAlignment="Center" Margin="10,0,0,0" ToolTip="Volume"
-                                    Style="{StaticResource MaterialDesignDiscreteHorizontalSlider}"
-                                    Foreground="{DynamicResource PrimaryHueLightBrush}"
+                                    Style="{StaticResource MaterialDesign3.MaterialDesignDiscreteHorizontalSlider}"
+                                    Foreground="{DynamicResource MaterialDesign.Brush.Primary.Light}"
                                     Maximum="100" Value="{Binding Settings.Volume}"  Panel.ZIndex="1000"/>
                         </StackPanel>
 
                         <Button DockPanel.Dock="Right" Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{md:PackIcon Kind=Stop}"
                                 ToolTip="Stop" Command="{Binding StopCommand}" CommandParameter="{Binding LoadedMedia}"
-                                Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource VisibleIfTrue}}"/>
 
                         <Button DockPanel.Dock="Right" Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{md:PackIcon Kind=Add}"
                                 ToolTip="Add station" Click="ShowAddStationDialogButton_Click"/>
@@ -202,7 +207,7 @@
                                                     </Border>
                                                 </Grid>
                                             </md:Card>
-                                            <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" Foreground="{DynamicResource SecondaryHueMidBrush}"
+                                            <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" Foreground="{DynamicResource MaterialDesign.Brush.Secondary}"
                                                          IsIndeterminate="True" Width="50" Height="50"
                                                          Visibility="{Binding State, Converter={StaticResource VisibleIfState}, ConverterParameter=Opening}"/>
 
@@ -307,9 +312,14 @@
 
             </DockPanel>
 
+            <Button Style="{StaticResource MaterialDesignIconForegroundButton}"
+                    Content="{md:PackIcon Kind=About}" Opacity="0.2"
+                    HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5"
+                    Command="{Binding Data.ShowAboutDialogCommand, Source={StaticResource windowProxy}}"/>
+
             <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,0,25,10"
-                        Visibility="{Binding IsVlcInitialized, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
-                <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" Foreground="{DynamicResource SecondaryHueMidBrush}" IsIndeterminate="True"/>
+                        Visibility="{Binding IsVlcInitialized, Converter={StaticResource VisibleIfFalse}}">
+                <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" Foreground="{DynamicResource MaterialDesign.Brush.Secondary}" IsIndeterminate="True"/>
                 <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}" Margin="10,0,0,0" Text="Initializing VLC..."/>
             </StackPanel>
 
@@ -322,7 +332,7 @@
                         Height="NaN" Width="NaN" Margin="0" Padding="5,0,0,0" Click="ClearSearchButton_Click"/>
             </StackPanel>
 
-            <md:Card Visibility="{Binding IsSearching, Converter={StaticResource BooleanToVisibilityConverter}}"
+            <md:Card Visibility="{Binding IsSearching, Converter={StaticResource VisibleIfTrue}}"
                      HorizontalAlignment="Left" VerticalAlignment="Top"
                      Margin="10,5" Padding="10,5">
                 <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" md:TextFieldAssist.HasLeadingIcon="True"

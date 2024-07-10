@@ -40,7 +40,9 @@ namespace Com.Josh2112.StreamIt.UI
             AssociatedObject.LayoutUpdated -= Selector_LayoutUpdated;
             scrollViewer = AssociatedObject.FirstVisualDescendantOfType<ScrollViewer>();
 
-            HorizontalOffset = scrollViewer!.HorizontalOffset;
+            if( scrollViewer != null )
+                HorizontalOffset = scrollViewer.HorizontalOffset;
+
         }
 
         private void Selector_SelectionChanged( object sender, SelectionChangedEventArgs e )

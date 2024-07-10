@@ -1,6 +1,5 @@
 ﻿using Com.Josh2112.Libs.MaterialDesign.DialogPlus;
 using CommunityToolkit.Mvvm.ComponentModel;
-using MaterialDesignThemes.Wpf;
 using System.ComponentModel.DataAnnotations;
 using System.Windows;
 
@@ -8,6 +7,9 @@ namespace Com.Josh2112.StreamIt.UI
 {
     public partial class TextModel : ObservableValidator
     {
+        public string Title { get; init; } = "Text Input";
+        public string OKButtonName { get; init; } = "OK";
+
         private string _text = "";
 
         [Required]
@@ -31,9 +33,9 @@ namespace Com.Josh2112.StreamIt.UI
 
         public DialogResult<string?> Result { get; } = new();
 
-        public TextInputDialog( string? text )
+        public TextInputDialog( TextModel model )
         {
-            Model = new() { Text = text ?? "" };
+            Model = model;
             InitializeComponent();
         }
 
