@@ -3,6 +3,7 @@ using Com.Josh2112.Libs.MaterialDesign.DialogPlus.Dialogs;
 using Com.Josh2112.StreamIt.UI;
 using CommunityToolkit.Mvvm.Input;
 using GongSolutions.Wpf.DragDrop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -186,5 +187,11 @@ namespace Com.Josh2112.StreamIt
 
         private void ClearSearchButton_Click( object sender, RoutedEventArgs e ) =>
             Model.SearchText = "";
+
+        private void VolumeSlider_MouseWheel( object sender, MouseWheelEventArgs e )
+        {
+            if( e.Delta > 0 ) Model.Settings.Volume = Math.Min( Model.Settings.Volume + 5, 100 );
+            else Model.Settings.Volume = Math.Max( Model.Settings.Volume - 5, 0 );
+        }
     }
 }

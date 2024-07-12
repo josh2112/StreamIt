@@ -109,7 +109,8 @@
                             <Slider Width="100" VerticalAlignment="Center" Margin="10,0,0,0" ToolTip="Volume"
                                     Style="{StaticResource MaterialDesign3.MaterialDesignDiscreteHorizontalSlider}"
                                     Foreground="{DynamicResource MaterialDesign.Brush.Primary.Light}"
-                                    Maximum="100" Value="{Binding Settings.Volume}"  Panel.ZIndex="1000"/>
+                                    Maximum="100" Value="{Binding Settings.Volume}" Panel.ZIndex="1000"
+                                    MouseWheel="VolumeSlider_MouseWheel"/>
                         </StackPanel>
 
                         <Button DockPanel.Dock="Right" Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{md:PackIcon Kind=Stop}"
