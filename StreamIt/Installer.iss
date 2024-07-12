@@ -3,7 +3,7 @@
 #define Application   "StreamIt"
 
 #define Exe           "StreamIt.exe"
-#define ExeDir        "bin\Release\net7.0-windows"
+#define ExeDir        "bin\Release\net8.0-windows8.0"
 #define ExeVersion    GetFileVersion( AddBackslash( ExeDir ) + Exe )
 
 #define Company       "Josh2112 Apps"
@@ -14,7 +14,7 @@ AppVerName={#Application}
 AppVersion={#ExeVersion}
 AppPublisher={#Company}
 AppPublisherURL=https://www.josh2112.com/apps/
-AppCopyright=Copyright (C) 2023 {#Company}
+AppCopyright=Copyright (C) 2024 {#Company}
 VersionInfoVersion={#ExeVersion}
 DefaultDirName={commonpf}\{#Company}\{#Application}
 DefaultGroupName={#Company}\{#Application}

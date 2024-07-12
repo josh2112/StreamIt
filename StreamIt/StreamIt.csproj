@@ -2,13 +2,14 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <Company>Josh2112 Apps</Company>
     <RootNamespace>Com.Josh2112.StreamIt</RootNamespace>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
-    <Version>1.2.6</Version>
+    <Version>1.2.8</Version>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 	
   <PropertyGroup Condition="'$(Platform)'=='AnyCPU'">
@@ -43,18 +44,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="CoreAudio" Version="1.37.0" />
     <PackageReference Include="gong-wpf-dragdrop" Version="3.2.1" />
-    <PackageReference Include="LibVLCSharp" Version="3.7.0" />
+    <PackageReference Include="LibVLCSharp" Version="3.8.5" />
     <PackageReference Include="MaterialDesign.DialogPlus" Version="1.1.0" />
-    <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
-    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.18" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.1.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.122" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.20" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Update="UI\EditTagsDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="UI\AboutDialog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="UI\TextInputDialog.xaml.cs">

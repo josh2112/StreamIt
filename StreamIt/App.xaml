@@ -7,13 +7,28 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <md:BundledTheme BaseTheme="Dark" PrimaryColor="DeepPurple" SecondaryColor="Lime" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesign.DialogPlus;component/Themes/Defaults.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <Style x:Key="MaterialDesign.DialogPlus.NeutralButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatSecondaryButton}"/>
 
+            <Style x:Key="NeonDialogHost" TargetType="{x:Type md:DialogHost}" BasedOn="{StaticResource {x:Type md:DialogHost}}">
+                <Setter Property="DialogContentUniformCornerRadius" Value="24"/>
+            </Style>
+
+            <Style x:Key="NeonDialogStyle" TargetType="UserControl">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="UserControl">
+                            <Border CornerRadius="24" BorderBrush="{DynamicResource MaterialDesign.Brush.Secondary}" BorderThickness="1.5">
+                                <ContentPresenter Margin="20"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="Com.Josh2112.StreamIt.UI.AboutDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             DataContext="{Binding RelativeSource={RelativeSource Self}}"
+             Style="{StaticResource NeonDialogStyle}">
+
+    <StackPanel>
+        <TextBlock Style="{StaticResource MaterialDesignHeadline5TextBlock}" Text="StreamIt"/>
+        <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="{Binding Version}"/>
+        <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}"
+                   Margin="0,10" Text="© 2024 Josh2112 Apps"/>
+
+        <Button Style="{StaticResource MaterialDesignFlatSecondaryButton}"
+                HorizontalAlignment="Right" Content="OK"
+                IsDefault="True" Click="OKButton_Click"/>
+    </StackPanel>
+
+</UserControl>

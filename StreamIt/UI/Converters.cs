@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -7,8 +8,8 @@ namespace Com.Josh2112.StreamIt.UI.Converters
 {
     public abstract class TrueFalseConverter : IValueConverter
     {
-        public object TrueValue { get; set; } = true;
-        public object FalseValue { get; set; } = false;
+        public virtual object TrueValue { get; set; } = true;
+        public virtual object FalseValue { get; set; } = false;
 
         protected abstract bool Convert(object value, object parameter);
 
@@ -75,5 +76,19 @@ namespace Com.Josh2112.StreamIt.UI.Converters
         {
             throw new NotImplementedException();
         }
+    }
+
+    public class BooleanToVisibilityConverter : TrueFalseConverter
+    {
+        public override object TrueValue => Visibility.Visible;
+        public override object FalseValue => Visibility.Collapsed;
+
+        protected override bool Convert( object value, object parameter ) => System.Convert.ToBoolean( value );
+    }
+
+    public class InverseBooleanToVisibilityConverter : BooleanToVisibilityConverter
+    {
+        public override object TrueValue => Visibility.Collapsed;
+        public override object FalseValue => Visibility.Visible;
     }
 }

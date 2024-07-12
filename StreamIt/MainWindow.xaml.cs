@@ -38,7 +38,7 @@ namespace Com.Josh2112.StreamIt
 
         private void MediaEntry_MouseDoubleClick( object sender, MouseButtonEventArgs e )
         {
-            if( (sender as FrameworkElement)?.DataContext is MediaEntry entry && entry.State != MediaStates.Playing )
+            if( sender is FrameworkElement { DataContext: MediaEntry entry } && entry.State != MediaStates.Playing )
                 Model.Play( entry );
         }
 
@@ -62,7 +62,12 @@ namespace Com.Josh2112.StreamIt
         [RelayCommand]
         private async Task RenameMediaAsync( MediaEntry entry )
         {
-            if( await this.ShowDialogForResultAsync( new TextInputDialog( entry.Name ) ) is string name )
+            if( await this.ShowDialogForResultAsync( new TextInputDialog( new TextModel
+            {
+                Title = "Rename station",
+                OKButtonName = "Rename",
+                Text = entry.Name ?? ""
+            } ) ) is string name )
             {
                 entry.Name = name;
                 Model.Settings.Save();
@@ -92,6 +97,9 @@ namespace Com.Josh2112.StreamIt
             }
         }
 
+        [RelayCommand]
+        private Task ShowAboutDialogAsync() => this.ShowDialogForResultAsync( new AboutDialog() );
+
         private void CurrentSongInfo_MouseDown( object sender, MouseButtonEventArgs e ) =>
             Model.MediaEntries!.MoveCurrentTo( Model.LoadedMedia );
 
@@ -102,12 +110,12 @@ namespace Com.Josh2112.StreamIt
                 string[]? paths = data.GetData( DataFormats.FileDrop ) as string[];
                 
                 if( paths is null && data.GetData( DataFormats.Text ) is string str )
-                    paths = new string[] { str };
+                    paths = [str];
                 
                 if( paths is not null )
                     return paths;
             }
-            return Enumerable.Empty<string>();
+            return [];
         }
 
         void IDropTarget.DragOver( IDropInfo dropInfo )
@@ -132,7 +140,7 @@ namespace Com.Josh2112.StreamIt
                     errors.Add( path );
             }
 
-            if( errors.Any() )
+            if( errors.Count != 0 )
             {
                 await this.ShowDialogForResultAsync( new Dialog( "Couldn't add station",
                     "Ran into a problem adding the following station(s):\n\n" +
