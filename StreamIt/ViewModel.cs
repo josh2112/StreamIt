@@ -21,7 +21,7 @@ namespace Com.Josh2112.StreamIt
         private LibVLCSharp.Shared.MediaPlayer? mediaPlayer;
 
         private readonly DispatcherTimer cutOffTimer = new();
-        private readonly DispatcherTimer elapsedTimeTimer = new() { Interval = TimeSpan.FromSeconds( 0.5 ) };
+        private readonly DispatcherTimer elapsedTimeTimer = new( DispatcherPriority.Render ) { Interval = TimeSpan.FromSeconds( 0.5 ) };
 
         public SnackbarMessageQueue SnackbarMessages { get; } = new();
 

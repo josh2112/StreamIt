@@ -21,6 +21,8 @@ namespace Com.Josh2112.StreamIt
 {
     public partial class MainWindow : Window, IDropTarget
     {
+        TESTING_StreamWithNAudio testStream;
+
         public ViewModel Model { get; } = new();
 
         public MainWindow()
@@ -32,6 +34,9 @@ namespace Com.Josh2112.StreamIt
             InitializeComponent();
 
             ChangeTitle( null );
+
+            testStream = new TESTING_StreamWithNAudio( "http://s5.voscast.com:9152/" );
+            testStream.Start();
         }
 
         private void ChangeTitle( string? title ) =>

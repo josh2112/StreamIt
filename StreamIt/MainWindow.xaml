@@ -24,7 +24,8 @@
         <converters:StringIsNullOrWhitespaceConverter x:Key="IsEmptyString"/>
         <converters:DisplayNameToLetterIconConverter x:Key="DisplayNameToLetterIconConverter"/>
         <converters:MediaStateConverter x:Key="VisibleIfState" TrueValue="Visible" FalseValue="Collapsed"/>
-        
+        <converters:UnsetPropertyIfNullConverter x:Key="UnsetPropertyIfNull"/>
+
         <converters:NullConverter x:Key="VisibleIfNull" NullValue="Visible" NotNullValue="Collapsed"/>
         <converters:NullConverter x:Key="IsNotNullConverter" NullValue="False" NotNullValue="True"/>
         <converters:NonZeroConverter x:Key="VisibleIfNonZero" TrueValue="Visible" FalseValue="Collapsed"/>
@@ -79,7 +80,7 @@
                     <BlurEffect Radius="50"/>
                 </Border.Effect>
                 <Border.Background>
-                    <ImageBrush ImageSource="{Binding LoadedMedia.ImagePath, TargetNullValue={x:Null}}" Stretch="UniformToFill"/>
+                    <ImageBrush ImageSource="{Binding LoadedMedia.ImagePath, Converter={StaticResource UnsetPropertyIfNull}}" Stretch="UniformToFill"/>
                 </Border.Background>
             </Border>
             <Border Opacity="0.2">
@@ -87,7 +88,7 @@
                     <BlurEffect Radius="50"/>
                 </Border.Effect>
                 <Border.Background>
-                    <ImageBrush ImageSource="{Binding LoadedMedia.CurrentSong.SongData.ImagePath, TargetNullValue={x:Null}}" Stretch="UniformToFill"/>
+                    <ImageBrush ImageSource="{Binding LoadedMedia.CurrentSong.SongData.ImagePath, Converter={StaticResource UnsetPropertyIfNull}}" Stretch="UniformToFill"/>
                 </Border.Background>
             </Border>
 
@@ -198,12 +199,12 @@
                                                     </Border>
                                                     <Border>
                                                         <Border.Background>
-                                                            <ImageBrush ImageSource="{Binding ImagePath, TargetNullValue={x:Null}}"/>
+                                                            <ImageBrush ImageSource="{Binding ImagePath, Converter={StaticResource UnsetPropertyIfNull}}"/>
                                                         </Border.Background>
                                                     </Border>
                                                     <Border>
                                                         <Border.Background>
-                                                            <ImageBrush ImageSource="{Binding CurrentSong.SongData.ImagePath, TargetNullValue={x:Null}}"/>
+                                                            <ImageBrush ImageSource="{Binding CurrentSong.SongData.ImagePath, Converter={StaticResource UnsetPropertyIfNull}}"/>
                                                         </Border.Background>
                                                     </Border>
                                                 </Grid>
@@ -251,7 +252,7 @@
                                                                                 </Border>
                                                                                 <Border CornerRadius="15">
                                                                                     <Border.Background>
-                                                                                        <ImageBrush ImageSource="{Binding SongData.ImagePath, FallbackValue={x:Null}}"/>
+                                                                                        <ImageBrush ImageSource="{Binding SongData.ImagePath, Converter={StaticResource UnsetPropertyIfNull}}"/>
                                                                                     </Border.Background>
                                                                                 </Border>
                                                                             </Grid>

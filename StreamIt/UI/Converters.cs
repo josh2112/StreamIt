@@ -91,4 +91,13 @@ namespace Com.Josh2112.StreamIt.UI.Converters
         public override object TrueValue => Visibility.Collapsed;
         public override object FalseValue => Visibility.Visible;
     }
+
+    public class UnsetPropertyIfNullConverter : IValueConverter
+    {
+        public object Convert( object value, Type targetType, object parameter, CultureInfo culture ) =>
+            value is null ? DependencyProperty.UnsetValue : value;
+
+        public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture ) =>
+            throw new NotImplementedException();
+    }
 }
