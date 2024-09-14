@@ -21,8 +21,6 @@ namespace Com.Josh2112.StreamIt
 {
     public partial class MainWindow : Window, IDropTarget
     {
-        TESTING_StreamWithNAudio testStream;
-
         public ViewModel Model { get; } = new();
 
         public MainWindow()
@@ -34,9 +32,6 @@ namespace Com.Josh2112.StreamIt
             InitializeComponent();
 
             ChangeTitle( null );
-
-            testStream = new TESTING_StreamWithNAudio( "http://s5.voscast.com:9152/" );
-            testStream.Start();
         }
 
         private void ChangeTitle( string? title ) =>
@@ -104,16 +99,16 @@ namespace Com.Josh2112.StreamIt
         }
 
         [RelayCommand]
-        private Task ShowAboutDialogAsync() => this.ShowDialogForResultAsync( new AboutDialog() );
+        private Task<bool> ShowAboutDialogAsync() => this.ShowDialogForResultAsync( new AboutDialog() );
 
         private void CurrentSongInfo_MouseDown( object sender, MouseButtonEventArgs e ) =>
             Model.MediaEntries!.MoveCurrentTo( Model.LoadedMedia );
 
-        private static IEnumerable<string> GetValidDroppedPaths( object dropData )
+        private static string[] GetValidDroppedPaths( object dropData )
         {
             if( dropData is DataObject data )
             {
-                string[]? paths = data.GetData( DataFormats.FileDrop ) as string[];
+                var paths = data.GetData( DataFormats.FileDrop ) as string[];
                 
                 if( paths is null && data.GetData( DataFormats.Text ) is string str )
                     paths = [str];
@@ -126,7 +121,7 @@ namespace Com.Josh2112.StreamIt
 
         void IDropTarget.DragOver( IDropInfo dropInfo )
         {
-            if( true == GetValidDroppedPaths( dropInfo.Data )?.Any() )
+            if( !(GetValidDroppedPaths( dropInfo.Data )?.Length == 0 ))
             {
                 dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
                 dropInfo.Effects = DragDropEffects.Copy;

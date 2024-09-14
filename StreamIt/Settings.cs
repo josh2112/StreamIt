@@ -29,7 +29,7 @@ namespace Com.Josh2112.StreamIt
 
     public partial class MediaEntry : ObservableObject
     {
-        public ObservableCollection<string> Tags { get; set; } = new();
+        public ObservableCollection<string> Tags { get; set; } = [];
 
         [ObservableProperty]
         private string _name = "";
@@ -126,7 +126,7 @@ namespace Com.Josh2112.StreamIt
         [ObservableProperty]
         private TimeSpan _cutOffTime;
 
-        public ObservableCollection<MediaEntry> MediaEntries { get; } = new();
+        public ObservableCollection<MediaEntry> MediaEntries { get; } = [];
 
         public Settings( ObservableCollection<MediaEntry>? mediaEntries = null ) =>
             MediaEntries = mediaEntries ?? MediaEntries;

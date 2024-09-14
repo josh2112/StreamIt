@@ -7,7 +7,7 @@ namespace Com.Josh2112.StreamIt.UI
 {
     public partial class AboutDialog : System.Windows.Controls.UserControl, IHasDialogResult<bool>
     {
-        public Version? Version => Assembly.GetEntryAssembly()?.GetName().Version;
+        public static Version? Version => Assembly.GetEntryAssembly()?.GetName().Version;
 
         public DialogResult<bool> Result { get; } = new();
 

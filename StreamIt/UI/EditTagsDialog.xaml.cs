@@ -11,11 +11,11 @@ namespace Com.Josh2112.StreamIt.UI
     [ObservableObject]
     public partial class EditTagsDialog : System.Windows.Controls.UserControl, IHasDialogResult<List<string>?>
     {
-        private ObservableCollection<string> allTags;
+        private readonly ObservableCollection<string> allTags;
 
         public ListCollectionView FilteredTags { get; }
 
-        public ObservableCollection<string> MediaTags { get; } = new();
+        public ObservableCollection<string> MediaTags { get; } = [];
 
         public DialogResult<List<string>?> Result { get; } = new();
 
@@ -25,8 +25,10 @@ namespace Com.Josh2112.StreamIt.UI
         public EditTagsDialog( IList<string> allTags, IList<string> mediaTags )
         {
             this.allTags = new( allTags );
-            FilteredTags = new( this.allTags );
-            FilteredTags.Filter = ( obj ) => obj is string t && (string.IsNullOrWhiteSpace( SelectedTag ) || t.Contains( SelectedTag.ToLower()));
+            FilteredTags = new( this.allTags )
+            {
+                Filter = ( obj ) => obj is string t && (string.IsNullOrWhiteSpace( SelectedTag ) || t.Contains( SelectedTag, System.StringComparison.CurrentCultureIgnoreCase ))
+            };
 
             MediaTags = new( mediaTags );
 
@@ -37,7 +39,7 @@ namespace Com.Josh2112.StreamIt.UI
             Result.Set( null );
 
         public void OKButton_Click( object sender, RoutedEventArgs e ) =>
-            Result.Set( MediaTags.ToList() );
+            Result.Set( [.. MediaTags] );
 
         private void TagChip_Delete_Click( object sender, RoutedEventArgs e )
         {

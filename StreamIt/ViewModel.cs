@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using System.Windows.Data;
 using System.Windows.Threading;
 
@@ -125,7 +126,7 @@ namespace Com.Josh2112.StreamIt
 
         private bool PassesFilter( MediaEntry entry ) =>
             string.IsNullOrWhiteSpace( searchTextLowercase ) ||
-            entry.Name.ToLower().Contains( searchTextLowercase ) ||
+            entry.Name.Contains( searchTextLowercase, StringComparison.CurrentCultureIgnoreCase ) ||
             entry.Tags.Any( t => t.Contains( searchTextLowercase ) );
 
         private void OnMixerVolumeChanged( object sender, float newVolume, bool newMute ) =>
@@ -189,7 +190,7 @@ namespace Com.Josh2112.StreamIt
         }
 
         [RelayCommand]
-        public void SearchSong( string? text )
+        public static void SearchSong( string? text )
         {
             if( text is not null )
             {
@@ -245,10 +246,8 @@ namespace Com.Josh2112.StreamIt
         private void OnMetadataChanged( object? sender, LibVLCSharp.Shared.MediaMetaChangedEventArgs e ) => dispatcher.Invoke( async () => {
             if( LoadedMedia is not null )
             {
-                var value = LoadedMedia.Media!.Meta( e.MetadataType );
+                var value = HttpUtility.HtmlDecode( LoadedMedia.Media!.Meta( e.MetadataType ) );
                 if( string.IsNullOrWhiteSpace( value ) ) return;
-
-                Debug.WriteLine( $"Metadata changed: {e.MetadataType}: {value}" );
 
                 switch( e.MetadataType )
                 {
