@@ -249,39 +249,40 @@ namespace Com.Josh2112.StreamIt
                 var value = HttpUtility.HtmlDecode( LoadedMedia.Media!.Meta( e.MetadataType ) );
                 if( string.IsNullOrWhiteSpace( value ) ) return;
 
-                switch( e.MetadataType )
+                if( e.MetadataType == LibVLCSharp.Shared.MetadataType.NowPlaying )
                 {
-                    case LibVLCSharp.Shared.MetadataType.NowPlaying:
-                        NowPlayingChanged?.Invoke( this, value );
-                        if( LoadedMedia.CurrentSong?.Name != value! )
-                            LoadedMedia.History.Add( new( value!, DateTime.Now ) );
-                        if( LoadedMedia.CurrentSong!.SongData.Source == MetadataGrabber.Engines.None )
+                    NowPlayingChanged?.Invoke( this, value );
+                    if( LoadedMedia.CurrentSong?.Name != value )
+                    {
+                        LoadedMedia.History.Insert( 0, new( value, DateTime.Now ) );
+                        while( LoadedMedia.History.Count > 20 )
+                            LoadedMedia.History.RemoveAt( LoadedMedia.History.Count-1 );
+                    }
+                    if( LoadedMedia.CurrentSong!.SongData.Source == MetadataGrabber.Engines.None )
+                    {
+                        var song = LoadedMedia.CurrentSong!;
+                        song.SongData = await MetadataGrabber.GetSongMetadata( song.Name,
+                            MetadataGrabber.Engines.Deezer ) ?? song.SongData;
+                        if( song.SongData.ImagePath != null )
                         {
-                            var song = LoadedMedia.CurrentSong!;
-                            song.SongData = await MetadataGrabber.GetSongMetadata( song.Name,
-                                MetadataGrabber.Engines.Deezer ) ?? song.SongData;
-                            if( song.SongData.ImagePath != null )
-                            {
-                                LoadedMedia.LastSongImagePath = song.SongData.ImagePath!;
-                                Settings.Save();
-                            }
+                            LoadedMedia.LastSongImagePath = song.SongData.ImagePath!;
                         }
-                        break;
-
-                    case LibVLCSharp.Shared.MetadataType.Title:
-                        LoadedMedia.Name = value!;
-                        Settings.Save();
-                        break;
-
-                    case LibVLCSharp.Shared.MetadataType.ArtworkURL:
-                        if( await MetadataGrabber.GetArtworkAsync( value!,
-                            Path.Combine( Utils.DataPath.Value, LoadedMedia.Uri.GetHashCode().ToString() ) ) is string path )
-                        {
-                            LoadedMedia.ImageFilename = Path.GetFileName( path );
-                            Settings.Save();
-                        }
-                        break;
+                    }
                 }
+                else if( e.MetadataType == LibVLCSharp.Shared.MetadataType.Title )
+                {
+                    LoadedMedia.Name = value;
+                }
+                else if( e.MetadataType == LibVLCSharp.Shared.MetadataType.ArtworkURL )
+                {
+                    if( await MetadataGrabber.GetArtworkAsync( value!, Path.Combine(
+                        Utils.DataPath.Value, LoadedMedia.Uri.GetHashCode().ToString() ) ) is string path )
+                    {
+                        LoadedMedia.ImageFilename = Path.GetFileName( path );
+                    }
+                }
+
+                Settings.Save();
             }
         } );
 

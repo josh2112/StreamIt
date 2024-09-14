@@ -214,7 +214,7 @@
                                                          Visibility="{Binding State, Converter={StaticResource VisibleIfState}, ConverterParameter=Opening}"/>
 
                                             <Grid x:Name="controlsPanel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,15,15">
-                                                <Ellipse Width="40" Height="40" Fill="#3000"></Ellipse>
+                                                <Ellipse Width="40" Height="40" Fill="#3000"/>
                                                 <md:PopupBox HorizontalAlignment="Center" ToolTip="View song history, rename or delete this station">
                                                     <StackPanel>
                                                         <StackPanel Orientation="Horizontal" Margin="10,0">
@@ -234,7 +234,7 @@
                                                             <ItemsControl ItemsSource="{Binding History}" Padding="5">
                                                                 <ItemsControl.ItemsPanel>
                                                                     <ItemsPanelTemplate>
-                                                                        <DockPanel LastChildFill="False"/>
+                                                                        <VirtualizingStackPanel/>
                                                                     </ItemsPanelTemplate>
                                                                 </ItemsControl.ItemsPanel>
                                                                 <ItemsControl.ItemContainerStyle>

@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Windows.Media;
 
 namespace Com.Josh2112.StreamIt
 {
@@ -50,11 +49,10 @@ namespace Com.Josh2112.StreamIt
         [property: JsonIgnore]
         private MediaStates _state;
 
-        [JsonIgnore]
-        public ObservableCollection<Song> History { get; } = [];
+        public ObservableCollection<Song> History { get; set; } = [];
 
         [JsonIgnore]
-        public Song? CurrentSong => History.LastOrDefault();
+        public Song? CurrentSong => History.FirstOrDefault();
 
         [JsonIgnore]
         public string? ImagePath
@@ -87,9 +85,6 @@ namespace Com.Josh2112.StreamIt
 
         private static readonly JsonSerializerOptions JSON_OPTS = new() {
             WriteIndented = true,
-            Converters = {
-                new ColorJsonConverter()
-            }
         };
 
         public static readonly Settings DEFAULT = new() {
@@ -130,14 +125,5 @@ namespace Com.Josh2112.StreamIt
 
         public Settings( ObservableCollection<MediaEntry>? mediaEntries = null ) =>
             MediaEntries = mediaEntries ?? MediaEntries;
-    }
-
-    public class ColorJsonConverter : JsonConverter<Color>
-    {
-        public override Color Read( ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options ) =>
-            (Color)ColorConverter.ConvertFromString( reader.GetString() );
-
-        public override void Write( Utf8JsonWriter writer, Color value, JsonSerializerOptions options ) =>
-            writer.WriteStringValue( value.ToString() );
     }
 }
