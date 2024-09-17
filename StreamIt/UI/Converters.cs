@@ -100,4 +100,24 @@ namespace Com.Josh2112.StreamIt.UI.Converters
         public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture ) =>
             throw new NotImplementedException();
     }
+
+    public class RelativeDateConverter : IValueConverter
+    {
+        public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
+        {
+            var dt = (DateTime)value;
+            int diffdays = DateTime.Today.Subtract( dt ).Days;
+
+            return diffdays switch
+            {
+                0 => "Today",
+                1 => "Yesterday",
+                var x when x < 7 => dt.ToString( "dd" ),
+                _ => dt.ToString( "M" )
+            };
+        }
+
+        public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture ) =>
+            throw new NotImplementedException();
+    }
 }

@@ -65,6 +65,8 @@ namespace Com.Josh2112.StreamIt
             elapsedTimeTimer.Start();
 
             Settings = Settings.Load();
+            foreach( var me in Settings.MediaEntries )
+                me.CreateHistoryCollection();
 
             MediaEntries = new( Settings.MediaEntries );
 
@@ -167,6 +169,7 @@ namespace Com.Josh2112.StreamIt
         public void Play( MediaEntry media )
         {
             MediaEntries!.MoveCurrentTo( media );
+            media.HistoryCollection.MoveCurrentToFirst();
 
             SetMediaState( MediaStates.Stopped );
             NowPlayingChanged?.Invoke( this, null );
@@ -257,16 +260,14 @@ namespace Com.Josh2112.StreamIt
                         LoadedMedia.History.Insert( 0, new( value, DateTime.Now ) );
                         while( LoadedMedia.History.Count > 20 )
                             LoadedMedia.History.RemoveAt( LoadedMedia.History.Count-1 );
+                        
+                        LoadedMedia.HistoryCollection.MoveCurrentToFirst();
                     }
-                    if( LoadedMedia.CurrentSong!.SongData.Source == MetadataGrabber.Engines.None )
+                    if( LoadedMedia.CurrentSong?.SongData.Source == MetadataGrabber.Engines.None )
                     {
                         var song = LoadedMedia.CurrentSong!;
                         song.SongData = await MetadataGrabber.GetSongMetadata( song.Name,
                             MetadataGrabber.Engines.Deezer ) ?? song.SongData;
-                        if( song.SongData.ImagePath != null )
-                        {
-                            LoadedMedia.LastSongImagePath = song.SongData.ImagePath!;
-                        }
                     }
                 }
                 else if( e.MetadataType == LibVLCSharp.Shared.MetadataType.Title )

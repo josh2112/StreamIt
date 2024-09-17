@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 /// TODO:
@@ -29,8 +31,14 @@ namespace Com.Josh2112.StreamIt
 
             Loaded += async ( s, e ) => await Model.InitializeAsync();
 
-            InitializeComponent();
+            Icon = Imaging.CreateBitmapSourceFromHIcon(
+                    System.Drawing.Icon.ExtractAssociatedIcon(
+                     System.Reflection.Assembly.GetEntryAssembly()!.ManifestModule.Name )!.Handle,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions() ); 
 
+            InitializeComponent();
+            
             ChangeTitle( null );
         }
 
