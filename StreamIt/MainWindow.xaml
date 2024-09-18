@@ -13,59 +13,17 @@
         dd:DragDrop.DropHandler="{Binding RelativeSource={RelativeSource Self}}"
         PreviewTextInput="Window_PreviewTextInput">
 
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="MouseEnter">
-            <i:ControlStoryboardAction ControlStoryboardOption="Play" >
-                <i:ControlStoryboardAction.Storyboard>
-                    <Storyboard>
-                        <DoubleAnimation Storyboard.TargetName="searchHint" Storyboard.TargetProperty="Opacity"
-                                         From="0" To="1" Duration="0:0:1"/>
-                        <DoubleAnimation Storyboard.TargetName="searchHint" Storyboard.TargetProperty="Opacity"
-                                         From="1" To="0" Duration="0:0:1" BeginTime="0:0:3"/>
-                    </Storyboard>
-                </i:ControlStoryboardAction.Storyboard>
-            </i:ControlStoryboardAction>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
-
-    <Window.Style>
-        <Style TargetType="{x:Type local:MainWindow}" BasedOn="{StaticResource MaterialDesignWindow}">
-            <Setter Property="WindowChrome.WindowChrome">
-                <Setter.Value>
-                    <WindowChrome GlassFrameThickness="-1"/>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type local:MainWindow}">
-                        <Grid>
-                            <Border>
-                                <ContentPresenter Content="{TemplateBinding Content}"/>
-                            </Border>
-                            <TextBlock Text="{TemplateBinding Title}"
-                                       VerticalAlignment="Top" HorizontalAlignment="Left"
-                                       Margin="36,8,0,0"/>
-                            <Image VerticalAlignment="Top" HorizontalAlignment="Left"
-                                   Margin="8"
-                                   Width="{Binding Source={x:Static SystemParameters.SmallIconWidth}}"
-                                   Source="{TemplateBinding Icon}"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Style>
-
     <i:Interaction.Behaviors>
         <ui:ThemeAwareWindowChromeBehavior/>
     </i:Interaction.Behaviors>
 
     <Window.Resources>
         
-        
         <ui:BindingProxy x:Key="windowProxy" Data="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
-        
+
         <converters:StringIsNullOrWhitespaceConverter x:Key="IsEmptyString"/>
+        <converters:StringIsNullOrWhitespaceConverter x:Key="VisibleIfEmpty" TrueValue="Visible" FalseValue="Collapsed"/>
+
         <converters:DisplayNameToLetterIconConverter x:Key="DisplayNameToLetterIconConverter"/>
         <converters:MediaStateConverter x:Key="VisibleIfState" TrueValue="Visible" FalseValue="Collapsed"/>
         <converters:UnsetPropertyIfNullConverter x:Key="UnsetPropertyIfNull"/>
@@ -117,6 +75,75 @@
         </DataTemplate>
         
     </Window.Resources>
+
+
+
+    <Window.Style>
+        <Style TargetType="{x:Type local:MainWindow}" BasedOn="{StaticResource MaterialDesignWindow}">
+            <Setter Property="WindowChrome.WindowChrome">
+                <Setter.Value>
+                    <WindowChrome GlassFrameThickness="-1"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type local:MainWindow}">
+                        <Grid>
+                            <Border>
+                                <ContentPresenter Content="{TemplateBinding Content}"/>
+                            </Border>
+
+                            <!-- Window title & icon -->
+                            <TextBlock Text="{TemplateBinding Title}"
+                                       VerticalAlignment="Top" HorizontalAlignment="Left"
+                                       Margin="36,8,0,0"/>
+                            <Image VerticalAlignment="Top" HorizontalAlignment="Left"
+                                   Margin="8"
+                                   Width="{Binding Source={x:Static SystemParameters.SmallIconWidth}}"
+                                   Source="{TemplateBinding Icon}"/>
+
+                            <!-- Search stuff -->
+                            <Grid WindowChrome.IsHitTestVisibleInChrome="True" VerticalAlignment="Top"
+                                  HorizontalAlignment="Right" Margin="0,4,150,0"
+                                  DataContext="{Binding Model, RelativeSource={RelativeSource AncestorType=Window}}">
+
+                                <StackPanel x:Name="searchHintButton" Orientation="Horizontal" HorizontalAlignment="Right"
+                                            Background="Transparent" Cursor="Hand" TextElement.Foreground="#6fff" Margin="0,2,0,0"
+                                            Visibility="{Binding SearchText, Converter={StaticResource VisibleIfEmpty}}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseDown" SourceObject="{Binding ElementName=searchHintButton}">
+                                            <i:ChangePropertyAction TargetObject="{Binding}" PropertyName="IsSearching" Value="True"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                    <TextBlock Text="Search" Margin="0,2,0,0"/>
+                                    <Border BorderBrush="#3fff" BorderThickness="1" CornerRadius="4" Margin="5,0,0,0" Padding="5,1">
+                                        <TextBlock Text="/"/>
+                                    </Border>
+                                </StackPanel>
+
+                                <md:Card Background="#1fff" WindowChrome.IsHitTestVisibleInChrome="True" Padding="10,5"
+                                         Visibility="{Binding SearchText, Converter={StaticResource StringIsEmptyVisibilityConverter}}">
+                                    <StackPanel Orientation="Horizontal" MouseDown="SearchTextBlock_MouseDown">
+                                        <TextBlock Text="{Binding SearchText}"/>
+                                        <Button Style="{StaticResource MaterialDesignToolForegroundButton}" Content="{md:PackIcon Kind=ClearCircle,Size=16}"
+                                                Opacity="0.2" Height="NaN" Width="NaN" Margin="0" Padding="5,0,0,0" Click="ClearSearchButton_Click"/>
+                                    </StackPanel>
+                                </md:Card>
+
+                                <md:Card Visibility="{Binding IsSearching, Converter={StaticResource VisibleIfTrue}}" Padding="10,5">
+                                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" md:TextFieldAssist.HasLeadingIcon="True"
+                                             md:TextFieldAssist.LeadingIcon="Search" IsVisibleChanged="SearchTextBox_IsVisibleChanged"
+                                             PreviewKeyDown="SearchTextBox_PreviewKeyDown" LostFocus="SearchTextBox_LostFocus"/>
+                                </md:Card>
+                            </Grid>
+
+
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Style>
 
     <md:DialogHost Style="{StaticResource NeonDialogHost}">
         <Grid>
@@ -262,8 +289,8 @@
                                             <Grid x:Name="controlsPanel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,15,15">
                                                 <Ellipse Width="40" Height="40" Fill="#3000"/>
                                                 <md:PopupBox HorizontalAlignment="Center" ToolTip="View song history, rename or delete this station">
-                                                    <StackPanel>
-                                                        <StackPanel Orientation="Horizontal" Margin="10,0">
+                                                    <DockPanel>
+                                                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10,0">
                                                             <Button Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{md:PackIcon Kind=Rename}"
                                                                     Command="{Binding Data.RenameMediaCommand, Source={StaticResource windowProxy}}"
                                                                     CommandParameter="{Binding}" ToolTip="Rename"/>
@@ -274,7 +301,7 @@
                                                                     Command="{Binding Data.DeleteMediaCommand, Source={StaticResource windowProxy}}"
                                                                     CommandParameter="{Binding}" ToolTip="Delete"/>
                                                         </StackPanel>
-                                                        <TextBlock Margin="10" Text="No song history" Visibility="{Binding History.Count, Converter={StaticResource VisibleIfZero}}"/>
+                                                        <TextBlock DockPanel.Dock="Top" Margin="10" Text="No song history" Visibility="{Binding History.Count, Converter={StaticResource VisibleIfZero}}"/>
                                                         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
                                                                       Visibility="{Binding History.Count, Converter={StaticResource VisibleIfNonZero}}">
                                                             <ItemsControl ItemsSource="{Binding HistoryCollection}" Padding="5">
@@ -341,7 +368,7 @@
                                                                 </ItemsControl.ItemTemplate>
                                                             </ItemsControl>
                                                         </ScrollViewer>
-                                                    </StackPanel>
+                                                    </DockPanel>
                                                 </md:PopupBox>
                                             </Grid>
                                         </Grid>
@@ -389,33 +416,6 @@
                 <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" Foreground="{DynamicResource MaterialDesign.Brush.Secondary}" IsIndeterminate="True"/>
                 <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}" Margin="10,0,0,0" Text="Initializing VLC..."/>
             </StackPanel>
-
-            <Grid HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,8,0,0" WindowChrome.IsHitTestVisibleInChrome="True">
-
-                <md:Card x:Name="searchHint" Opacity="0" Background="#1fff" Padding="10,5">
-                    <StackPanel Orientation="Horizontal">
-                        <md:PackIcon Kind="InfoCircle" Margin="0,0,5,0"/>
-                        <TextBlock Text="Type '/' to search"/>
-                    </StackPanel>
-                </md:Card>
-
-                <md:Card Background="#1fff" WindowChrome.IsHitTestVisibleInChrome="True" Padding="10,5"
-                         Visibility="{Binding SearchText, Converter={StaticResource StringIsEmptyVisibilityConverter}}">
-                    <StackPanel Orientation="Horizontal" MouseDown="SearchTextBlock_MouseDown">
-                        <TextBlock Text="{Binding SearchText}"/>
-                        <Button Style="{StaticResource MaterialDesignToolForegroundButton}" Content="{md:PackIcon Kind=ClearCircle,Size=16}"
-                                Opacity="0.2" 
-                                Height="NaN" Width="NaN" Margin="0" Padding="5,0,0,0" Click="ClearSearchButton_Click"/>
-                    </StackPanel>
-                </md:Card>
-
-                <md:Card Visibility="{Binding IsSearching, Converter={StaticResource VisibleIfTrue}}" Padding="10,5">
-                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" md:TextFieldAssist.HasLeadingIcon="True"
-                             md:TextFieldAssist.LeadingIcon="Search"
-                             IsVisibleChanged="SearchTextBox_IsVisibleChanged" PreviewKeyDown="SearchTextBox_PreviewKeyDown"
-                             LostFocus="SearchTextBox_LostFocus"/>
-                </md:Card>
-            </Grid>
 
             <md:Snackbar MessageQueue="{Binding SnackbarMessages}" HorizontalAlignment="Left"/>
 
