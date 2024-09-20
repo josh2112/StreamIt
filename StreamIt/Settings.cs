@@ -5,12 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Windows.Data;
 
 namespace Com.Josh2112.StreamIt
 {
     public enum MediaStates { Stopped, Opening, Playing }
 
-    public record SongData( MetadataGrabber.Engines Source, long ID, string Title, string? Artist = null, string? Album = null, string? Year = null )
+    public record SongData( MetadataGrabber.Engines Source, long ID, string Title,
+        string? Artist = null, string? Album = null, string? Year = null )
     {
         public string? ImagePath { get; set; } = null;
     }
@@ -18,12 +20,13 @@ namespace Com.Josh2112.StreamIt
     public partial class Song : ObservableObject
     {
         public string Name { get; }
-        public DateTime? Start { get; }
+
+        public DateTime Start { get; }
 
         [ObservableProperty]
         private SongData _songData = new( MetadataGrabber.Engines.None, 0, "" );
 
-        public Song( string name, DateTime? start ) => (Name, Start) = (name, start);
+        public Song( string name, DateTime start ) => (Name, Start) = (name, start);
     }
 
     public partial class MediaEntry : ObservableObject
@@ -42,14 +45,12 @@ namespace Com.Josh2112.StreamIt
         private string _imageFilename = "";
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor( nameof( ImagePath ) )]
-        private string _lastSongImagePath = "";
-
-        [ObservableProperty]
         [property: JsonIgnore]
         private MediaStates _state;
 
         public ObservableCollection<Song> History { get; set; } = [];
+
+        public ListCollectionView HistoryCollection { get; private set; } = null!;
 
         [JsonIgnore]
         public Song? CurrentSong => History.FirstOrDefault();
@@ -61,9 +62,10 @@ namespace Com.Josh2112.StreamIt
             {
                 if( Path.Combine( Utils.DataPath.Value, ImageFilename ) is string p && File.Exists( p ) )
                     return p;
-                else if( File.Exists( LastSongImagePath ) )
-                    return LastSongImagePath;
-                else return null;
+                else if( File.Exists( CurrentSong?.SongData?.ImagePath ) )
+                    return CurrentSong.SongData.ImagePath;
+                else
+                    return null;
             }
         }
 
@@ -71,9 +73,18 @@ namespace Com.Josh2112.StreamIt
         public LibVLCSharp.Shared.Media? Media { get; set; }
 
         partial void OnImageFilenameChanged( string value ) => OnPropertyChanged( nameof( ImagePath ) );
-        partial void OnLastSongImagePathChanged( string value ) => OnPropertyChanged( nameof( ImagePath ) );
 
-        public MediaEntry() => History.CollectionChanged += ( s, e ) => OnPropertyChanged( nameof( CurrentSong ) );
+        public MediaEntry()
+        {
+            History.CollectionChanged += ( s, e ) => OnPropertyChanged( nameof( CurrentSong ) );
+        }
+
+        public void CreateHistoryCollection()
+        {
+            HistoryCollection = new( History );
+            HistoryCollection.GroupDescriptions.Add( new PropertyGroupDescription( "Start.Date" ) );
+
+        }
 
         partial void OnNameChanged( string value ) => OnPropertyChanged( nameof( DisplayName ) );
     }

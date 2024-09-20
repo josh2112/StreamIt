@@ -7,8 +7,7 @@
         xmlns:ui="clr-namespace:Com.Josh2112.StreamIt.UI"
         xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:converters="clr-namespace:Com.Josh2112.StreamIt.UI.Converters"
-        Style="{StaticResource MaterialDesignWindow}"
-        Width="800" Height="500"
+        Width="800" Height="460"
         DataContext="{Binding Model, RelativeSource={RelativeSource Self}}"
         dd:DragDrop.IsDropTarget="True"
         dd:DragDrop.DropHandler="{Binding RelativeSource={RelativeSource Self}}"
@@ -19,9 +18,12 @@
     </i:Interaction.Behaviors>
 
     <Window.Resources>
-        <ui:BindingProxy x:Key="windowProxy" Data="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
         
+        <ui:BindingProxy x:Key="windowProxy" Data="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+
         <converters:StringIsNullOrWhitespaceConverter x:Key="IsEmptyString"/>
+        <converters:StringIsNullOrWhitespaceConverter x:Key="VisibleIfEmpty" TrueValue="Visible" FalseValue="Collapsed"/>
+
         <converters:DisplayNameToLetterIconConverter x:Key="DisplayNameToLetterIconConverter"/>
         <converters:MediaStateConverter x:Key="VisibleIfState" TrueValue="Visible" FalseValue="Collapsed"/>
         <converters:UnsetPropertyIfNullConverter x:Key="UnsetPropertyIfNull"/>
@@ -33,6 +35,8 @@
         
         <converters:BooleanToVisibilityConverter x:Key="VisibleIfTrue"/>
         <converters:InverseBooleanToVisibilityConverter x:Key="VisibleIfFalse"/>
+
+        <converters:RelativeDateConverter x:Key="RelativeDateConverter"/>
 
         <FrameworkElement x:Key="PrimaryHueProxy" DataContext="{DynamicResource MaterialDesign.Brush.Primary}"/>
         <FrameworkElement x:Key="SecondaryHueProxy" DataContext="{DynamicResource MaterialDesign.Brush.Secondary}"/>
@@ -54,12 +58,12 @@
                     <TextBlock.Style>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignBody2TextBlock}">
                             <Setter Property="Visibility" Value="Collapsed"/>
-                            <Setter Property="Text" Value="{Binding CurrentSong.Name}"/>
+                            <Setter Property="Text" Value="{Binding HistoryCollection.CurrentItem.Name}"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding State}" Value="Playing">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding CurrentSong}" Value="{x:Null}">
+                                <DataTrigger Binding="{Binding HistoryCollection.CurrentItem}" Value="{x:Null}">
                                     <Setter Property="Text" Value="No title"/>
                                     <Setter Property="Opacity" Value="0.5"/>
                                 </DataTrigger>
@@ -71,6 +75,75 @@
         </DataTemplate>
         
     </Window.Resources>
+
+
+
+    <Window.Style>
+        <Style TargetType="{x:Type local:MainWindow}" BasedOn="{StaticResource MaterialDesignWindow}">
+            <Setter Property="WindowChrome.WindowChrome">
+                <Setter.Value>
+                    <WindowChrome GlassFrameThickness="-1"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type local:MainWindow}">
+                        <Grid>
+                            <Border>
+                                <ContentPresenter Content="{TemplateBinding Content}"/>
+                            </Border>
+
+                            <!-- Window title & icon -->
+                            <TextBlock Text="{TemplateBinding Title}"
+                                       VerticalAlignment="Top" HorizontalAlignment="Left"
+                                       Margin="36,8,0,0"/>
+                            <Image VerticalAlignment="Top" HorizontalAlignment="Left"
+                                   Margin="8"
+                                   Width="{Binding Source={x:Static SystemParameters.SmallIconWidth}}"
+                                   Source="{TemplateBinding Icon}"/>
+
+                            <!-- Search stuff -->
+                            <Grid WindowChrome.IsHitTestVisibleInChrome="True" VerticalAlignment="Top"
+                                  HorizontalAlignment="Right" Margin="0,4,150,0"
+                                  DataContext="{Binding Model, RelativeSource={RelativeSource AncestorType=Window}}">
+
+                                <StackPanel x:Name="searchHintButton" Orientation="Horizontal" HorizontalAlignment="Right"
+                                            Background="Transparent" Cursor="Hand" TextElement.Foreground="#6fff" Margin="0,2,0,0"
+                                            Visibility="{Binding SearchText, Converter={StaticResource VisibleIfEmpty}}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseDown" SourceObject="{Binding ElementName=searchHintButton}">
+                                            <i:ChangePropertyAction TargetObject="{Binding}" PropertyName="IsSearching" Value="True"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                    <TextBlock Text="Search" Margin="0,2,0,0"/>
+                                    <Border BorderBrush="#3fff" BorderThickness="1" CornerRadius="4" Margin="5,0,0,0" Padding="5,1">
+                                        <TextBlock Text="/"/>
+                                    </Border>
+                                </StackPanel>
+
+                                <md:Card Background="#1fff" WindowChrome.IsHitTestVisibleInChrome="True" Padding="10,5"
+                                         Visibility="{Binding SearchText, Converter={StaticResource StringIsEmptyVisibilityConverter}}">
+                                    <StackPanel Orientation="Horizontal" MouseDown="SearchTextBlock_MouseDown">
+                                        <TextBlock Text="{Binding SearchText}"/>
+                                        <Button Style="{StaticResource MaterialDesignToolForegroundButton}" Content="{md:PackIcon Kind=ClearCircle,Size=16}"
+                                                Opacity="0.2" Height="NaN" Width="NaN" Margin="0" Padding="5,0,0,0" Click="ClearSearchButton_Click"/>
+                                    </StackPanel>
+                                </md:Card>
+
+                                <md:Card Visibility="{Binding IsSearching, Converter={StaticResource VisibleIfTrue}}" Padding="10,5">
+                                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" md:TextFieldAssist.HasLeadingIcon="True"
+                                             md:TextFieldAssist.LeadingIcon="Search" IsVisibleChanged="SearchTextBox_IsVisibleChanged"
+                                             PreviewKeyDown="SearchTextBox_PreviewKeyDown" LostFocus="SearchTextBox_LostFocus"/>
+                                </md:Card>
+                            </Grid>
+
+
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Style>
 
     <md:DialogHost Style="{StaticResource NeonDialogHost}">
         <Grid>
@@ -88,11 +161,11 @@
                     <BlurEffect Radius="50"/>
                 </Border.Effect>
                 <Border.Background>
-                    <ImageBrush ImageSource="{Binding LoadedMedia.CurrentSong.SongData.ImagePath, Converter={StaticResource UnsetPropertyIfNull}}" Stretch="UniformToFill"/>
+                    <ImageBrush ImageSource="{Binding LoadedMedia.HistoryCollection.CurrentItem.SongData.ImagePath, Converter={StaticResource UnsetPropertyIfNull}}" Stretch="UniformToFill"/>
                 </Border.Background>
             </Border>
 
-            <DockPanel>
+            <DockPanel Margin="0,20,0,0">
 
                 <!-- Controls area -->
                 <Border DockPanel.Dock="Bottom" Margin="10" Padding="20,10" CornerRadius="30"
@@ -204,7 +277,7 @@
                                                     </Border>
                                                     <Border>
                                                         <Border.Background>
-                                                            <ImageBrush ImageSource="{Binding CurrentSong.SongData.ImagePath, Converter={StaticResource UnsetPropertyIfNull}}"/>
+                                                            <ImageBrush ImageSource="{Binding HistoryCollection.CurrentItem.SongData.ImagePath, Converter={StaticResource UnsetPropertyIfNull}}"/>
                                                         </Border.Background>
                                                     </Border>
                                                 </Grid>
@@ -216,8 +289,8 @@
                                             <Grid x:Name="controlsPanel" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,15,15">
                                                 <Ellipse Width="40" Height="40" Fill="#3000"/>
                                                 <md:PopupBox HorizontalAlignment="Center" ToolTip="View song history, rename or delete this station">
-                                                    <StackPanel>
-                                                        <StackPanel Orientation="Horizontal" Margin="10,0">
+                                                    <DockPanel>
+                                                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10,0">
                                                             <Button Style="{StaticResource MaterialDesignIconForegroundButton}" Content="{md:PackIcon Kind=Rename}"
                                                                     Command="{Binding Data.RenameMediaCommand, Source={StaticResource windowProxy}}"
                                                                     CommandParameter="{Binding}" ToolTip="Rename"/>
@@ -228,10 +301,10 @@
                                                                     Command="{Binding Data.DeleteMediaCommand, Source={StaticResource windowProxy}}"
                                                                     CommandParameter="{Binding}" ToolTip="Delete"/>
                                                         </StackPanel>
-                                                        <TextBlock Margin="10" Text="No song history" Visibility="{Binding History.Count, Converter={StaticResource VisibleIfZero}}"/>
+                                                        <TextBlock DockPanel.Dock="Top" Margin="10" Text="No song history" Visibility="{Binding History.Count, Converter={StaticResource VisibleIfZero}}"/>
                                                         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
                                                                       Visibility="{Binding History.Count, Converter={StaticResource VisibleIfNonZero}}">
-                                                            <ItemsControl ItemsSource="{Binding History}" Padding="5">
+                                                            <ItemsControl ItemsSource="{Binding HistoryCollection}" Padding="5">
                                                                 <ItemsControl.ItemsPanel>
                                                                     <ItemsPanelTemplate>
                                                                         <VirtualizingStackPanel/>
@@ -242,6 +315,25 @@
                                                                         <Setter Property="DockPanel.Dock" Value="Bottom"/>
                                                                     </Style>
                                                                 </ItemsControl.ItemContainerStyle>
+                                                                <ItemsControl.GroupStyle>
+                                                                    <GroupStyle>
+                                                                        <GroupStyle.ContainerStyle>
+                                                                            <Style TargetType="GroupItem">
+                                                                                <Setter Property="Template">
+                                                                                    <Setter.Value>
+                                                                                        <ControlTemplate TargetType="GroupItem">
+                                                                                            <StackPanel>
+                                                                                                <TextBlock Margin="10,0,0,0" Text="{Binding Name.Date, Converter={StaticResource RelativeDateConverter}}"
+                                                                                                           Style="{StaticResource MaterialDesignBodyLargeTextBlock}" Opacity="0.6"/>
+                                                                                                <ItemsPresenter/>
+                                                                                            </StackPanel>
+                                                                                        </ControlTemplate>
+                                                                                    </Setter.Value>
+                                                                                </Setter>
+                                                                            </Style>
+                                                                        </GroupStyle.ContainerStyle>
+                                                                    </GroupStyle>
+                                                                </ItemsControl.GroupStyle>
                                                                 <ItemsControl.ItemTemplate>
                                                                     <DataTemplate>
                                                                         <DockPanel Margin="10">
@@ -276,7 +368,7 @@
                                                                 </ItemsControl.ItemTemplate>
                                                             </ItemsControl>
                                                         </ScrollViewer>
-                                                    </StackPanel>
+                                                    </DockPanel>
                                                 </md:PopupBox>
                                             </Grid>
                                         </Grid>
@@ -324,24 +416,6 @@
                 <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}" Foreground="{DynamicResource MaterialDesign.Brush.Secondary}" IsIndeterminate="True"/>
                 <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}" Margin="10,0,0,0" Text="Initializing VLC..."/>
             </StackPanel>
-
-            <StackPanel Margin="10" Orientation="Horizontal" MouseDown="SearchTextBlock_MouseDown"
-                        Visibility="{Binding SearchText, Converter={StaticResource StringIsEmptyVisibilityConverter}}"
-                        HorizontalAlignment="Left" VerticalAlignment="Top">
-                <TextBlock Text="{Binding SearchText}"/>
-                <Button Style="{StaticResource MaterialDesignToolForegroundButton}" Content="{md:PackIcon Kind=ClearCircle,Size=16}"
-                        Opacity="0.2"
-                        Height="NaN" Width="NaN" Margin="0" Padding="5,0,0,0" Click="ClearSearchButton_Click"/>
-            </StackPanel>
-
-            <md:Card Visibility="{Binding IsSearching, Converter={StaticResource VisibleIfTrue}}"
-                     HorizontalAlignment="Left" VerticalAlignment="Top"
-                     Margin="10,5" Padding="10,5">
-                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" md:TextFieldAssist.HasLeadingIcon="True"
-                         md:TextFieldAssist.LeadingIcon="Search" md:TextFieldAssist.HasClearButton="True"
-                         IsVisibleChanged="SearchTextBox_IsVisibleChanged" PreviewKeyDown="SearchTextBox_PreviewKeyDown"
-                         LostFocus="SearchTextBox_LostFocus"/>
-            </md:Card>
 
             <md:Snackbar MessageQueue="{Binding SnackbarMessages}" HorizontalAlignment="Left"/>
 

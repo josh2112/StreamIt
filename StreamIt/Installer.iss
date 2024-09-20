@@ -18,7 +18,6 @@ AppCopyright=Copyright (C) 2024 {#Company}
 VersionInfoVersion={#ExeVersion}
 DefaultDirName={commonpf}\{#Company}\{#Application}
 DefaultGroupName={#Company}\{#Application}
-MinVersion=6.1.7601
 Compression=lzma2
 SolidCompression=yes
 OutputDir=..\Installers
