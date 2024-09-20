@@ -120,12 +120,12 @@ namespace Com.Josh2112.StreamIt
 
             var somaFmRegex = new Regex( @"somafm\.com/([^-]*)" );
 
-            if( somaFmRegex.Match( stationUrl ) is Match m )
+            if( somaFmRegex.Match( stationUrl ) is Match m && m.Success )
             {
                 var stationName = m.Groups[1].Value;
                 var response = await HttpClient.GetAsync( $"https://somafm.com/{stationName}/" );
                 if( new Regex( @"<meta property=""og:image"" content=""(.*)""" ).Match(
-                    await response.Content.ReadAsStringAsync()) is Match m2 )
+                    await response.Content.ReadAsStringAsync()) is Match m2 && m2.Success )
                 {
                     return await GetArtworkAsync( m2.Groups[1].Value, Path.GetTempFileName() );
                 }
