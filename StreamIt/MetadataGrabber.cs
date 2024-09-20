@@ -42,22 +42,24 @@ namespace Com.Josh2112.StreamIt
 
         public static HttpClient HttpClient { get; } = new();
 
-        // Delicious Agony: "ARTIST - TRACK, from the YEAR album `ALBUM`"
-        [GeneratedRegex( @"(?'artist'.*) -{1,2} (?'track'.*), from the (?'year'\d+) album `(?'album'.*)`" )]
-        private static partial Regex DelicousAgonyRegex();
+        public static partial class SongTitleRegexes
+        {
+            // Delicious Agony: "ARTIST - TRACK, from the YEAR album `ALBUM`"
+            [GeneratedRegex( @"(?'artist'.*) -{1,2} (?'track'.*), from the (?'year'\d+) album `(?'album'.*)`" )]
+            internal static partial Regex DelicousAgonyRegex();
 
-        // Sleepbot: "ARTIST -- TRACK -- ALBUM (YEAR) -- /SONGID"
-        [GeneratedRegex( @"(?'artist'.+) -{1,2} (?'track'.+) -{1,2} (?'album'.+) \((?'year'\d+)\) -{1,2} \/.*" )]
-        private static partial Regex SleepbotRegex();
+            // Sleepbot: "ARTIST -- TRACK -- ALBUM (YEAR) -- /SONGID"
+            [GeneratedRegex( @"(?'artist'.+) -{1,2} (?'track'.+) -{1,2} (?'album'.+) \((?'year'\d+)\) -{1,2} \/.*" )]
+            internal static partial Regex SleepbotRegex();
 
-        // Standard: "ARTIST - TRACK[ - ALBUM][ (New)| (Live)]
-        [GeneratedRegex( @"(?'artist'.*?) -{1,2} (?'track'.*?)(?: -{1,2} (?'album'.*?))?(?= \(New\)$| \(Live\)$|$)" )]
-        private static partial Regex StandardRegex();
+            // Standard: "ARTIST - TRACK[ - ALBUM][ (New)| (Live)]
+            [GeneratedRegex( @"(?'artist'.*?) -{1,2} (?'track'.*?)(?: -{1,2} (?'album'.*?))?(?= \(New\)$| \(Live\)$|$)" )]
+            internal static partial Regex StandardRegex();
+        }
 
         public static SongData ParseSongTitle( string title )
         {
-            var regexes = typeof( MetadataGrabber )
-                .GetMethods( System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static )
+            var regexes = typeof( SongTitleRegexes ).GetMethods()
                 .Where( m => m.ReturnType == typeof( Regex ) )
                 .Select( m => m.Invoke( null, null ) )
                 .OfType<Regex>();
@@ -110,6 +112,27 @@ namespace Com.Josh2112.StreamIt
                 return path;
             }
             else return null;
+        }
+
+        public static async Task<string?> GetStationArtworkAsync( string stationUrl )
+        {
+            // http://ice5.somafm.com/doomed-128-mp3
+
+            var somaFmRegex = new Regex( @"somafm\.com/([^-]*)" );
+
+            if( somaFmRegex.Match( stationUrl ) is Match m )
+            {
+                var stationName = m.Groups[1].Value;
+                var response = await HttpClient.GetAsync( $"https://somafm.com/{stationName}/" );
+                if( new Regex( @"<meta property=""og:image"" content=""(.*)""" ).Match(
+                    await response.Content.ReadAsStringAsync()) is Match m2 )
+                {
+                    return await GetArtworkAsync( m2.Groups[1].Value, Path.GetTempFileName() );
+                }
+            }
+
+            return null;
+
         }
     }
 }

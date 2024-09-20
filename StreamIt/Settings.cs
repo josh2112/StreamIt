@@ -41,8 +41,7 @@ namespace Com.Josh2112.StreamIt
         public string Uri { get; set; } = "";
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor( nameof( ImagePath ) )]
-        private string _imageFilename = "";
+        private string? _imagePath = null;
 
         [ObservableProperty]
         [property: JsonIgnore]
@@ -50,34 +49,17 @@ namespace Com.Josh2112.StreamIt
 
         public ObservableCollection<Song> History { get; set; } = [];
 
+        [property: JsonIgnore]
         public ListCollectionView HistoryCollection { get; private set; } = null!;
 
         [JsonIgnore]
         public Song? CurrentSong => History.FirstOrDefault();
 
         [JsonIgnore]
-        public string? ImagePath
-        {
-            get
-            {
-                if( Path.Combine( Utils.DataPath.Value, ImageFilename ) is string p && File.Exists( p ) )
-                    return p;
-                else if( File.Exists( CurrentSong?.SongData?.ImagePath ) )
-                    return CurrentSong.SongData.ImagePath;
-                else
-                    return null;
-            }
-        }
-
-        [JsonIgnore]
         public LibVLCSharp.Shared.Media? Media { get; set; }
 
-        partial void OnImageFilenameChanged( string value ) => OnPropertyChanged( nameof( ImagePath ) );
-
-        public MediaEntry()
-        {
+        public MediaEntry() =>
             History.CollectionChanged += ( s, e ) => OnPropertyChanged( nameof( CurrentSong ) );
-        }
 
         public void CreateHistoryCollection()
         {

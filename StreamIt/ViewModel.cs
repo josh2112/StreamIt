@@ -166,7 +166,7 @@ namespace Com.Josh2112.StreamIt
         }
 
         [RelayCommand]
-        public void Play( MediaEntry media )
+        public async Task PlayAsync( MediaEntry media )
         {
             MediaEntries!.MoveCurrentTo( media );
             media.HistoryCollection.MoveCurrentToFirst();
@@ -176,6 +176,11 @@ namespace Com.Josh2112.StreamIt
 
             media.Media!.MetaChanged += OnMetadataChanged;
             mediaPlayer!.Play( media.Media );
+
+            if( media.ImagePath is null )
+            {
+                media.ImagePath = await MetadataGrabber.GetStationArtworkAsync( media.Uri );
+            }
         }
 
         private static bool CanStop( MediaEntry? entry ) => entry?.State == MediaStates.Playing;
@@ -279,7 +284,7 @@ namespace Com.Josh2112.StreamIt
                     if( await MetadataGrabber.GetArtworkAsync( value!, Path.Combine(
                         Utils.DataPath.Value, LoadedMedia.Uri.GetHashCode().ToString() ) ) is string path )
                     {
-                        LoadedMedia.ImageFilename = Path.GetFileName( path );
+                        LoadedMedia.ImagePath = path;
                     }
                 }
 

@@ -45,10 +45,10 @@ namespace Com.Josh2112.StreamIt
         private void ChangeTitle( string? title ) =>
             Title = $"{title ?? ""}{(title is not null ? " - " : "")}{Utils.AssemblyInfo.ProductName}";
 
-        private void MediaEntry_MouseDoubleClick( object sender, MouseButtonEventArgs e )
+        private async void MediaEntry_MouseDoubleClick( object sender, MouseButtonEventArgs e )
         {
             if( sender is FrameworkElement { DataContext: MediaEntry entry } && entry.State != MediaStates.Playing )
-                Model.Play( entry );
+                await Model.PlayAsync( entry ).ConfigureAwait( false );
         }
 
         private async void ShowAddStationDialogButton_Click( object sender, RoutedEventArgs e )
@@ -58,7 +58,7 @@ namespace Com.Josh2112.StreamIt
                 if( await Model.AddStationAsync( station ) is MediaEntry entry )
                 {
                     Model.MediaEntries!.MoveCurrentTo( entry );
-                    Model.Play( entry );
+                    await Model.PlayAsync( entry ).ConfigureAwait( false );
                 }
                 else
                 {
@@ -160,7 +160,7 @@ namespace Com.Josh2112.StreamIt
             if( newMedia.FirstOrDefault() is MediaEntry entry )
             {
                 Model.MediaEntries!.MoveCurrentTo( entry );
-                Model.Play( entry );
+                await Model.PlayAsync( entry ).ConfigureAwait( false );
             }
         }
 
