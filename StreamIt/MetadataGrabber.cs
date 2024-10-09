@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -59,7 +60,7 @@ namespace Com.Josh2112.StreamIt
 
         public static SongData ParseSongTitle( string title )
         {
-            var regexes = typeof( SongTitleRegexes ).GetMethods()
+            var regexes = typeof( SongTitleRegexes ).GetMethods( BindingFlags.NonPublic | BindingFlags.Static )
                 .Where( m => m.ReturnType == typeof( Regex ) )
                 .Select( m => m.Invoke( null, null ) )
                 .OfType<Regex>();
