@@ -76,8 +76,6 @@
         
     </Window.Resources>
 
-
-
     <Window.Style>
         <Style TargetType="{x:Type local:MainWindow}" BasedOn="{StaticResource MaterialDesignWindow}">
             <Setter Property="WindowChrome.WindowChrome">
@@ -93,49 +91,52 @@
                                 <ContentPresenter Content="{TemplateBinding Content}"/>
                             </Border>
 
-                            <!-- Window title & icon -->
-                            <TextBlock Text="{TemplateBinding Title}"
-                                       VerticalAlignment="Top" HorizontalAlignment="Left"
-                                       Margin="36,8,0,0"/>
-                            <Image VerticalAlignment="Top" HorizontalAlignment="Left"
-                                   Margin="8"
-                                   Width="{Binding Source={x:Static SystemParameters.SmallIconWidth}}"
-                                   Source="{TemplateBinding Icon}"/>
+                            <DockPanel VerticalAlignment="Top">
+                                <!-- Window icon -->
+                                <Image DockPanel.Dock="Left" Margin="8"
+                                       Width="{Binding Source={x:Static SystemParameters.SmallIconWidth}}"
+                                       Source="{TemplateBinding Icon}"/>
 
-                            <!-- Search stuff -->
-                            <Grid WindowChrome.IsHitTestVisibleInChrome="True" VerticalAlignment="Top"
-                                  HorizontalAlignment="Right" Margin="0,4,150,0"
-                                  DataContext="{Binding Model, RelativeSource={RelativeSource AncestorType=Window}}">
+                                <!-- Search stuff -->
+                                <Grid WindowChrome.IsHitTestVisibleInChrome="True"
+                                      DockPanel.Dock="Right" Margin="0,4,150,0"
+                                      DataContext="{Binding Model, RelativeSource={RelativeSource AncestorType=Window}}">
 
-                                <StackPanel x:Name="searchHintButton" Orientation="Horizontal" HorizontalAlignment="Right"
-                                            Background="Transparent" Cursor="Hand" TextElement.Foreground="#6fff" Margin="0,2,0,0"
-                                            Visibility="{Binding SearchText, Converter={StaticResource VisibleIfEmpty}}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseDown" SourceObject="{Binding ElementName=searchHintButton}">
-                                            <i:ChangePropertyAction TargetObject="{Binding}" PropertyName="IsSearching" Value="True"/>
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                    <TextBlock Text="Search" Margin="0,2,0,0"/>
-                                    <Border BorderBrush="#3fff" BorderThickness="1" CornerRadius="4" Margin="5,0,0,0" Padding="5,1">
-                                        <TextBlock Text="/"/>
-                                    </Border>
-                                </StackPanel>
-
-                                <md:Card Background="#1fff" WindowChrome.IsHitTestVisibleInChrome="True" Padding="10,5"
-                                         Visibility="{Binding SearchText, Converter={StaticResource StringIsEmptyVisibilityConverter}}">
-                                    <StackPanel Orientation="Horizontal" MouseDown="SearchTextBlock_MouseDown">
-                                        <TextBlock Text="{Binding SearchText}"/>
-                                        <Button Style="{StaticResource MaterialDesignToolForegroundButton}" Content="{md:PackIcon Kind=ClearCircle,Size=16}"
-                                                Opacity="0.2" Height="NaN" Width="NaN" Margin="0" Padding="5,0,0,0" Click="ClearSearchButton_Click"/>
+                                    <StackPanel x:Name="searchHintButton" Orientation="Horizontal" HorizontalAlignment="Right"
+                                                Background="Transparent" Cursor="Hand" TextElement.Foreground="#6fff" Margin="0,2,0,0"
+                                                Visibility="{Binding SearchText, Converter={StaticResource VisibleIfEmpty}}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseDown" SourceObject="{Binding ElementName=searchHintButton}">
+                                                <i:ChangePropertyAction TargetObject="{Binding}" PropertyName="IsSearching" Value="True"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                        <TextBlock Text="Search" Margin="0,2,0,0"/>
+                                        <Border BorderBrush="#3fff" BorderThickness="1" CornerRadius="4" Margin="5,0,0,0" Padding="5,1">
+                                            <TextBlock Text="/"/>
+                                        </Border>
                                     </StackPanel>
-                                </md:Card>
 
-                                <md:Card Visibility="{Binding IsSearching, Converter={StaticResource VisibleIfTrue}}" Padding="10,5">
-                                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" md:TextFieldAssist.HasLeadingIcon="True"
-                                             md:TextFieldAssist.LeadingIcon="Search" IsVisibleChanged="SearchTextBox_IsVisibleChanged"
-                                             PreviewKeyDown="SearchTextBox_PreviewKeyDown" LostFocus="SearchTextBox_LostFocus"/>
-                                </md:Card>
-                            </Grid>
+                                    <md:Card Background="#1fff" WindowChrome.IsHitTestVisibleInChrome="True" Padding="10,5"
+                                             Visibility="{Binding SearchText, Converter={StaticResource StringIsEmptyVisibilityConverter}}">
+                                        <StackPanel Orientation="Horizontal" MouseDown="SearchTextBlock_MouseDown">
+                                            <TextBlock Text="{Binding SearchText}"/>
+                                            <Button Style="{StaticResource MaterialDesignToolForegroundButton}" Content="{md:PackIcon Kind=ClearCircle,Size=16}"
+                                                    Opacity="0.2" Height="NaN" Width="NaN" Margin="0" Padding="5,0,0,0" Click="ClearSearchButton_Click"/>
+                                        </StackPanel>
+                                    </md:Card>
+
+                                    <md:Card Visibility="{Binding IsSearching, Converter={StaticResource VisibleIfTrue}}" Padding="10,5">
+                                        <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" md:TextFieldAssist.HasLeadingIcon="True"
+                                                 md:TextFieldAssist.LeadingIcon="Search" IsVisibleChanged="SearchTextBox_IsVisibleChanged"
+                                                 PreviewKeyDown="SearchTextBox_PreviewKeyDown" LostFocus="SearchTextBox_LostFocus"/>
+                                    </md:Card>
+                                </Grid>
+
+
+                                <!-- Window title -->
+                                <TextBlock Text="{TemplateBinding Title}" HorizontalAlignment="Left" Margin="0,8,8,0"/>
+
+                            </DockPanel>
 
 
                         </Grid>
