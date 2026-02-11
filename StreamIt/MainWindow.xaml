@@ -102,7 +102,7 @@
                                       DockPanel.Dock="Right" Margin="0,4,150,0"
                                       DataContext="{Binding Model, RelativeSource={RelativeSource AncestorType=Window}}">
 
-                                    <StackPanel x:Name="searchHintButton" Orientation="Horizontal" HorizontalAlignment="Right"
+                                    <StackPanel x:Name="searchHintButton" Orientation="Horizontal"
                                                 Background="Transparent" Cursor="Hand" TextElement.Foreground="#6fff" Margin="0,2,0,0"
                                                 Visibility="{Binding SearchText, Converter={StaticResource VisibleIfEmpty}}">
                                         <i:Interaction.Triggers>
@@ -111,7 +111,8 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                         <TextBlock Text="Search" Margin="0,2,0,0"/>
-                                        <Border BorderBrush="#3fff" BorderThickness="1" CornerRadius="4" Margin="5,0,0,0" Padding="5,1">
+                                        <Border BorderBrush="#3fff" BorderThickness="1" CornerRadius="4" Margin="5,-5,0,0"
+                                                Height="22" Padding="7,1">
                                             <TextBlock Text="/"/>
                                         </Border>
                                     </StackPanel>
