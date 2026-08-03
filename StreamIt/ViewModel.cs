@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Data;
@@ -35,7 +36,7 @@ namespace Com.Josh2112.StreamIt
         private DateTime? lastStartTime;
 
         public TimeSpan? ElapsedTime => lastStartTime is not null ? TimeSpan.FromSeconds(
-            Math.Round( (DateTime.Now - lastStartTime).Value.TotalSeconds )) : null;
+            Math.Round( (DateTime.Now - lastStartTime).Value.TotalSeconds ) ) : null;
 
         public MediaEntry? SelectedMedia => MediaEntries?.CurrentItem as MediaEntry;
 
@@ -74,7 +75,8 @@ namespace Com.Josh2112.StreamIt
 
             MediaEntries.Filter = ( obj ) => obj is MediaEntry me && PassesFilter( me );
 
-            await Task.Run( () => {
+            await Task.Run( () =>
+            {
                 vlc = new LibVLCSharp.Shared.LibVLC();
                 mediaPlayer = new LibVLCSharp.Shared.MediaPlayer( vlc );
             } );
@@ -86,7 +88,8 @@ namespace Com.Josh2112.StreamIt
 
             mediaPlayer.Playing += ( s, e ) => dispatcher.Invoke( () => SetMediaState( MediaStates.Playing ) );
 
-            mediaPlayer.EncounteredError += ( s, e ) => dispatcher.Invoke( () => {
+            mediaPlayer.EncounteredError += ( s, e ) => dispatcher.Invoke( () =>
+            {
                 SetMediaState( MediaStates.Stopped );
                 SnackbarMessages.Enqueue( $"Can't play {LoadedMedia!.DisplayName}" );
             } );
@@ -97,27 +100,41 @@ namespace Com.Josh2112.StreamIt
             cutOffTimer.Tick += ( s, e ) => Stop( LoadedMedia! );
             SetCutOffTimer();
 
+            ReinitializeMixer();
+            UpdateVolume();
+
+            Settings.PropertyChanged += ( s, e ) =>
+            {
+                if( e.PropertyName == nameof( Settings.Volume ) )
+                {
+                    UpdateVolume();
+                    Settings.IsMute = false;
+                }
+                else if( e.PropertyName == nameof( Settings.IsMute ) && Mixer is not null )
+                    Mixer.Mute = Settings.IsMute;
+            };
+        }
+
+        private void UpdateVolume()
+        {
+            try
+            {
+                if( Mixer is not null )
+                    Mixer.MasterVolume = (float)Math.Pow( Settings.Volume / 100.0, 3 );
+            }
+            catch( COMException )
+            {
+                ReinitializeMixer();
+                UpdateVolume();
+            }
+        }
+
+        private void ReinitializeMixer()
+        {
             var device = new MMDeviceEnumerator( Guid.NewGuid() ).GetDefaultAudioEndpoint( DataFlow.Render, Role.Multimedia );
             var session = device.AudioSessionManager2?.Sessions?.FirstOrDefault( s => s.ProcessID == Environment.ProcessId );
             session!.OnSimpleVolumeChanged += OnMixerVolumeChanged;
             Mixer = session?.SimpleAudioVolume;
-
-            if( Mixer is not null )
-            {
-                void UpdateVolume() => Mixer.MasterVolume = (float)Math.Pow( Settings.Volume / 100.0, 3 );
-
-                UpdateVolume();
-
-                Settings.PropertyChanged += ( s, e ) => {
-                    if( e.PropertyName == nameof( Settings.Volume ) )
-                    {
-                        UpdateVolume();
-                        Settings.IsMute = false;
-                    }
-                    else if( e.PropertyName == nameof( Settings.IsMute ) )
-                        Mixer.Mute = Settings.IsMute;
-                };
-            }
         }
 
         partial void OnSearchTextChanged( string value )
@@ -185,7 +202,7 @@ namespace Com.Josh2112.StreamIt
 
         private static bool CanStop( MediaEntry? entry ) => entry?.State == MediaStates.Playing;
 
-        [RelayCommand( CanExecute = nameof( CanStop ))]
+        [RelayCommand( CanExecute = nameof( CanStop ) )]
         public void Stop( MediaEntry? media )
         {
             if( media is not null )
@@ -202,7 +219,8 @@ namespace Com.Josh2112.StreamIt
         {
             if( text is not null )
             {
-                Process.Start( new ProcessStartInfo() {
+                Process.Start( new ProcessStartInfo()
+                {
                     FileName = new Uri( $"https://music.youtube.com/search?q={text}" ).AbsoluteUri.ToString(),
                     UseShellExecute = true
                 } );
@@ -235,7 +253,8 @@ namespace Com.Josh2112.StreamIt
 
             if( url != null )
             {
-                var entry = new MediaEntry {
+                var entry = new MediaEntry
+                {
                     Uri = url!,
                     Name = title ?? string.Empty
                 };
@@ -251,7 +270,8 @@ namespace Com.Josh2112.StreamIt
             return null;
         }
 
-        private void OnMetadataChanged( object? sender, LibVLCSharp.Shared.MediaMetaChangedEventArgs e ) => dispatcher.Invoke( async () => {
+        private void OnMetadataChanged( object? sender, LibVLCSharp.Shared.MediaMetaChangedEventArgs e ) => dispatcher.Invoke( async () =>
+        {
             if( LoadedMedia is not null )
             {
                 var value = HttpUtility.HtmlDecode( LoadedMedia.Media!.Meta( e.MetadataType ) );
@@ -264,8 +284,8 @@ namespace Com.Josh2112.StreamIt
                     {
                         LoadedMedia.History.Insert( 0, new( value, DateTime.Now ) );
                         while( LoadedMedia.History.Count > 20 )
-                            LoadedMedia.History.RemoveAt( LoadedMedia.History.Count-1 );
-                        
+                            LoadedMedia.History.RemoveAt( LoadedMedia.History.Count - 1 );
+
                         LoadedMedia.HistoryCollection.MoveCurrentToFirst();
                     }
                     if( LoadedMedia.CurrentSong?.SongData.Source == MetadataGrabber.Engines.None )
